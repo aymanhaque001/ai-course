@@ -1,22 +1,22 @@
-site_name: "Complete AI & Machine Learning Course"
-site_description: "From mathematical foundations to production AI systems — a comprehensive, self-paced curriculum"
-site_url: "https://aymanhaque001.github.io/ai-course/"
-repo_url: "https://github.com/aymanhaque001/ai-course"
-repo_name: "aymanhaque001/ai-course"
+site_name: 'Complete AI & Machine Learning Course'
+site_description: 'From mathematical foundations to production AI systems — a comprehensive, self-paced curriculum'
+site_url: 'https://aymanhaque001.github.io/ai-course/'
+repo_url: 'https://github.com/aymanhaque001/ai-course'
+repo_name: 'aymanhaque001/ai-course'
 
 docs_dir: docs
 
 theme:
   name: material
   palette:
-    - media: "(prefers-color-scheme: light)"
+    - media: '(prefers-color-scheme: light)'
       scheme: default
       primary: deep purple
       accent: amber
       toggle:
         icon: material/brightness-7
         name: Switch to dark mode
-    - media: "(prefers-color-scheme: dark)"
+    - media: '(prefers-color-scheme: dark)'
       scheme: slate
       primary: deep purple
       accent: amber
@@ -39,7 +39,7 @@ theme:
     - toc.follow
   icon:
     repo: fontawesome/brands/github
-  logo: ""
+  logo: ''
 
 plugins:
   - search
@@ -83,25 +83,25 @@ extra:
 nav:
   - Home: index.md
   - Foundations:
-    - "11 — Math & Statistics": module-11-math-foundations/README.md
-    - "12 — Classical Machine Learning": module-12-classical-ml/README.md
-    - "13 — Deep Learning (Pre-Transformer)": module-13-deep-learning/README.md
+      - '11 — Math & Statistics': module-11-math-foundations/README.md
+      - '12 — Classical Machine Learning': module-12-classical-ml/README.md
+      - '13 — Deep Learning (Pre-Transformer)': module-13-deep-learning/README.md
   - Core LLM Stack:
-    - "01 — Neural Network Foundations": module-01-foundations/README.md
-    - "02 — Transformer Architecture": module-02-transformers/README.md
-    - "03 — Tokenization & Embeddings": module-03-tokenization-embeddings/README.md
-    - "04 — Training LLMs": module-04-training/README.md
-    - "05 — Prompt Engineering": module-05-prompt-engineering/README.md
-    - "06 — Retrieval-Augmented Generation": module-06-rag/README.md
-    - "07 — Evaluation & Benchmarks": module-07-evaluation/README.md
-    - "08 — Scaling & Inference": module-08-scaling/README.md
-    - "09 — Safety & Alignment": module-09-safety-alignment/README.md
-    - "10 — Advanced Topics": module-10-advanced/README.md
+      - '01 — Neural Network Foundations': module-01-foundations/README.md
+      - '02 — Transformer Architecture': module-02-transformers/README.md
+      - '03 — Tokenization & Embeddings': module-03-tokenization-embeddings/README.md
+      - '04 — Training LLMs': module-04-training/README.md
+      - '05 — Prompt Engineering': module-05-prompt-engineering/README.md
+      - '06 — Retrieval-Augmented Generation': module-06-rag/README.md
+      - '07 — Evaluation & Benchmarks': module-07-evaluation/README.md
+      - '08 — Scaling & Inference': module-08-scaling/README.md
+      - '09 — Safety & Alignment': module-09-safety-alignment/README.md
+      - '10 — Advanced Topics': module-10-advanced/README.md
   - Beyond LLMs:
-    - "14 — Generative AI": module-14-generative-ai/README.md
+      - '14 — Generative AI': module-14-generative-ai/README.md
   - Production:
-    - "15 — MLOps & Production ML": module-15-mlops/README.md
-    - "16 — AI Systems Design": module-16-ai-systems-design/README.md
+      - '15 — MLOps & Production ML': module-15-mlops/README.md
+      - '16 — AI Systems Design': module-16-ai-systems-design/README.md
 
 exclude_docs: |
   mkdocs.yml

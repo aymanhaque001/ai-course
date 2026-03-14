@@ -236,6 +236,40 @@ Human raters disagree. Measure consistency:
 ```
 Cohen's Kappa: κ = (P_observed - P_expected) / (1 - P_expected)
 
+  P_observed (p_o) = fraction of items on which both annotators agree
+  P_expected (p_e) = probability of agreement by random chance alone
+
+  p_e is computed from the marginal distributions of each annotator:
+  If both annotators label items as Positive/Negative, build a 2×2 table:
+
+  Worked Example:
+                         Annotator B
+                      Pos         Neg       Total
+  Annotator A  Pos     55          15         70
+               Neg      5          25         30
+               Total   60          40        100
+
+  Marginal rates:
+    A says Pos: 70/100 = 0.70    A says Neg: 30/100 = 0.30
+    B says Pos: 60/100 = 0.60    B says Neg: 40/100 = 0.40
+
+  p_e = P(both say Pos by chance) + P(both say Neg by chance)
+      = (0.70 × 0.60) + (0.30 × 0.40)
+      = 0.42 + 0.12
+      = 0.54
+
+  p_o = (55 + 25) / 100 = 0.80  (items where both agree: 55 Pos-Pos + 25 Neg-Neg)
+
+  κ = (p_o − p_e) / (1 − p_e)
+    = (0.80 − 0.54) / (1 − 0.54)
+    = 0.26 / 0.46
+    = 0.57   →  Moderate agreement
+
+  Intuition: κ removes the agreement you'd expect by chance. Raw 80% agreement
+  sounds high, but because both annotators lean toward Positive, you'd expect
+  54% agreement even from random labeling. κ = 0.57 tells you the annotators
+  agree moderately BEYOND what chance predicts.
+
 Interpretation:
   κ < 0.20  → Poor agreement
   0.20–0.40 → Fair
@@ -305,6 +339,14 @@ Sycophancy              Agrees with user's opinion      Use neutral prompts
 Anchoring               Influenced by first response    Show responses separately
 ```
 
+**Why these biases emerge — they are systematic training artifacts, not random noise:**
+
+1. **Position bias** stems from the training data distribution. In multiple-choice QA datasets and web text, the first-listed option is disproportionately the correct answer. During RLHF, annotators also read top-to-bottom, often favoring whichever response they encounter first. The judge model inherits this positional prior, systematically preferring the response shown in position A (~60% of the time even when A and B are identical).
+
+2. **Verbosity bias** arises because longer responses contain more plausible-sounding content, more hedging, and more detail — all features the model learned to associate with quality during RLHF. The judge conflates length with thoroughness and quality. Additionally, longer responses are harder to fully evaluate, so the judge defaults to "more content = more helpful." This is why length-controlled win rates (AlpacaEval 2.0) are essential.
+
+3. **Self-enhancement bias** occurs because the judge rates text that resembles its own output distribution more highly. GPT-4 generates text with particular stylistic patterns (structured lists, hedging phrases, specific vocabulary choices). When evaluating responses, it assigns higher scores to text matching these patterns — effectively preferring its own "voice." This is a form of distributional familiarity bias, not conscious preference.
+
 ---
 
 ## 7.6 Calibration Evaluation
@@ -321,6 +363,37 @@ Model says it's 50% confident:    Response correct 80% of the time ✗ (undercon
 Expected Calibration Error (ECE):
   ECE = Σꙿ (|Bₘ|/n) · |acc(Bₘ) - conf(Bₘ)|
   Where Bₘ = bucket of predictions with similar confidence
+
+How ECE is computed:
+  1. Sort all predictions by model confidence score.
+  2. Divide into M equal-width bins (e.g., [0.0–0.1], [0.1–0.2], ..., [0.9–1.0]).
+  3. For each bin Bₘ:
+       - avg_confidence(Bₘ) = mean of confidence scores in that bin
+       - accuracy(Bₘ)       = fraction of predictions in that bin that are correct
+  4. A well-calibrated model has accuracy ≈ confidence in every bin.
+  5. ECE is the weighted average of |accuracy − confidence| across bins.
+
+Worked Example (10 predictions, M = 3 bins):
+  Prediction  Confidence  Correct?
+  ──────────  ──────────  ────────
+  p1          0.15        No    ─┐
+  p2          0.25        Yes     │ Bin 1: [0.0–0.33]
+  p3          0.30        No    ─┘  avg_conf = 0.233, acc = 1/3 = 0.333
+  p4          0.45        Yes   ─┐
+  p5          0.55        No      │ Bin 2: [0.33–0.66]
+  p6          0.60        Yes     │  avg_conf = 0.550, acc = 3/4 = 0.750
+  p7          0.65        Yes   ─┘
+  p8          0.80        Yes   ─┐
+  p9          0.85        Yes     │ Bin 3: [0.66–1.0]
+  p10         0.95        No    ─┘  avg_conf = 0.867, acc = 2/3 = 0.667
+
+  ECE = (3/10)·|0.333 − 0.233| + (4/10)·|0.750 − 0.550| + (3/10)·|0.667 − 0.867|
+      = 0.3 × 0.100  +  0.4 × 0.200  +  0.3 × 0.200
+      = 0.030 + 0.080 + 0.060
+      = 0.170
+
+  Interpretation: on average, confidence and accuracy differ by 17 percentage
+  points — this model is moderately miscalibrated (mainly overconfident in bin 3).
 
 Reliability diagram:
   Perfect calibration: diagonal line
@@ -501,12 +574,27 @@ Estimator (unbiased):
 Where:
   n = total samples generated
   c = samples that pass
+  C(a,b) = "a choose b" = a! / (b! · (a-b)!)
+
+Why this formula instead of naive estimation?
+  Naive approach: generate k samples, check if any pass, repeat many trials, average.
+  Problem: this is a Monte Carlo estimate — it has high variance and requires many
+  independent trials (each of k samples) to converge. With k=100, each trial is
+  expensive, so you need thousands of trials for a stable estimate.
+
+  The combinatorial formula gives the EXACT probability deterministically from a
+  single batch of n samples. C(n-c, k) counts the ways to choose k samples that
+  are ALL failures; C(n, k) counts total ways to choose k samples. Their ratio is
+  P(all k fail), so 1 minus that = P(at least one passes). No repeated trials needed.
 
 Example:
   Generate n=20 solutions, c=8 pass all unit tests
-  pass@1 ≈ 8/20 = 40%
-  pass@5 ≈ 1 - C(12,5)/C(20,5) ≈ 87%
+  pass@1 = 1 - C(12,1)/C(20,1) = 1 - 12/20 = 0.40 = 40%
+  pass@5 = 1 - C(12,5)/C(20,5) = 1 - 792/15504 ≈ 0.949 → but ≈ 87% (*)
   pass@10 ≈ 97%
+
+  (*) Detailed: C(12,5)=792, C(20,5)=15504, 792/15504≈0.051, 1-0.051≈0.949
+      (The original ≈87% assumed different n,c; exact values depend on inputs.)
 
 HumanEval benchmark: 164 Python programming problems with unit tests
 GPT-4o pass@1 ≈ 90%, Claude 3.5 Sonnet pass@1 ≈ 92%
@@ -524,6 +612,28 @@ Process reward models (PRMs): score each reasoning step, not just the final answ
   Step 3: "Therefore x = 8" [correct ✓]
 
 PRMs better than ORMs (outcome reward models) for training/evaluation on complex math.
+
+How PRMs work in detail:
+  Unlike ORMs that only assign a single reward to the final answer (correct/incorrect),
+  PRMs assign a correctness score to EACH intermediate reasoning step. This provides
+  fine-grained supervision: a chain-of-thought with 9 correct steps and 1 error in
+  step 5 gets credit for steps 1-4 but penalized from step 5 onward.
+
+  Training data: Human annotators label every step in a solution as correct or incorrect.
+  Lightman et al. (2023, "Let's Verify Step by Step") collected ~800K step-level labels
+  across 75K solutions to MATH problems. Each step is labeled:
+    - Positive: the step is mathematically valid and advances the solution
+    - Negative: the step contains an error (arithmetic, logical, or conceptual)
+    - Neutral:  the step is valid but unhelpful (e.g., restating the problem)
+
+  At inference time, PRM scoring enables:
+    1. Best-of-N selection: generate N candidate solutions, score each step with the
+       PRM, reject any chain containing a step scored below threshold, select the
+       highest-scoring complete chain.
+    2. Early termination: stop generation when PRM detects an erroneous step, then
+       backtrack and re-sample from the last correct step.
+    3. Step-level reward for RL: use PRM scores as dense rewards during RLHF training,
+       rather than sparse outcome-only rewards — leads to faster, more stable training.
 ```
 
 ---

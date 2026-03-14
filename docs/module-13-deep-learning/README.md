@@ -339,6 +339,26 @@ The Architecture That Preceded Transformers:
   All information squeezed through one fixed-size vector.
   Long sentences lose early information.
 
+  Information-theoretic view of the bottleneck:
+  ┌────────────────────────────────────────────────────────────┐
+  │  A fixed-size vector of d dimensions in FP32 stores at    │
+  │  most 32d bits. For d=512, that's ~16 Kbits.              │
+  │                                                            │
+  │  For long sequences (100+ tokens, each with rich          │
+  │  semantic content), this is fundamentally insufficient.    │
+  │                                                            │
+  │  Data Processing Inequality:                               │
+  │    I(source; decoded) ≤ I(source; context_vector) ≤ 32d   │
+  │                                                            │
+  │  Information lost at the compression step CANNOT be        │
+  │  recovered by the decoder — no matter how powerful it is.  │
+  │                                                            │
+  │  Attention solves this by allowing the decoder to access   │
+  │  ALL encoder hidden states (h₁, h₂, ..., hₙ), removing   │
+  │  the fixed-capacity bottleneck entirely. Available info    │
+  │  scales as O(n·d) instead of O(d).                         │
+  └────────────────────────────────────────────────────────────┘
+
   Solution → Attention mechanism
 ```
 
@@ -461,6 +481,27 @@ Training Objectives:
      Randomly mask 15% of tokens, predict the originals
      "The [MASK] sat on the mat" → predict "cat"
 
+     Critical detail — the 80/10/10 strategy for those 15% masked tokens:
+     ┌────────────────────────────────────────────────────────────────────┐
+     │  80% → replaced with [MASK]                                      │
+     │        Primary training signal. Model learns to predict from     │
+     │        surrounding context.                                      │
+     │                                                                  │
+     │  10% → replaced with a RANDOM token                              │
+     │        Teaches model not to trust input literally — it must      │
+     │        verify every token against context, building robust       │
+     │        representations even for non-masked positions.            │
+     │                                                                  │
+     │  10% → kept UNCHANGED                                           │
+     │        Bridges the pre-train / fine-tune gap. [MASK] never       │
+     │        appears at fine-tune time, so if 100% were masked, the    │
+     │        model would learn representations biased toward [MASK]    │
+     │        inputs. Unchanged tokens teach it to produce useful       │
+     │        representations for normal (unmasked) text too.           │
+     └────────────────────────────────────────────────────────────────────┘
+     Without the unchanged tokens, there'd be a distribution mismatch:
+     pre-training sees [MASK] everywhere, fine-tuning sees none.
+
   2. Next Sentence Prediction (NSP):
      Given two sentences, predict if B follows A
      (later found to be unnecessary — RoBERTa removed it)
@@ -546,11 +587,33 @@ T5's Key Insight: EVERY NLP task = text-to-text
   │ 12 layers│    to encoder output   │ 12 layers│
   └──────────┘                        └──────────┘
 
-  Cross-Attention:
-    Q comes from DECODER
-    K, V come from ENCODER
+  Cross-Attention (vs Self-Attention):
+    Q comes from DECODER ("what am I looking for?")
+    K, V come from ENCODER ("what's available to look at?")
     → decoder can look at any part of the input
     → this is what's missing from decoder-only (GPT) models
+
+    ┌──────────────────────────────────────────────────────────┐
+    │  Self-Attention:   Q, K, V all from the SAME sequence    │
+    │    "Each token attends to every other token in its       │
+    │     own sequence" — used in encoder and masked in        │
+    │     decoder (causal self-attention).                      │
+    │                                                          │
+    │  Cross-Attention:  Q from one sequence, K/V from another │
+    │    Decoder Q = "I need info about the subject"           │
+    │    Encoder K = "Here are keys describing each input pos" │
+    │    Encoder V = "Here are the actual representations"     │
+    │    Attention = softmax(QKᵀ/√d) V                         │
+    │                                                          │
+    │    This is HOW the decoder "reads" the input:            │
+    │    it asks questions (Q) about the encoded               │
+    │    representation (K, V).                                │
+    │                                                          │
+    │  Same mechanism generalizes to:                          │
+    │    RAG: Q from query, K/V from retrieved documents       │
+    │    Multimodal: Q from text decoder, K/V from ViT encoder │
+    │    Any cross-modal fusion task                           │
+    └──────────────────────────────────────────────────────────┘
 
   T5 sizes: Small (60M), Base (220M), Large (770M),
             XL (3B), XXL (11B)
@@ -624,6 +687,28 @@ VAE = Autoencoder + Probabilistic Latent Space
   │                                                            │
   └────────────────────────────────────────────────────────────┘
 
+  Why the Reparameterization Trick is essential:
+  ┌────────────────────────────────────────────────────────────┐
+  │  Problem: We want z ~ N(μ, σ²), but sampling is           │
+  │  STOCHASTIC — you can't differentiate through a random    │
+  │  draw. There's no gradient ∂z/∂μ or ∂z/∂σ for a sample.  │
+  │                                                            │
+  │  Naive path (BROKEN for backprop):                         │
+  │    μ, σ → [SAMPLE z ~ N(μ,σ²)] → Decoder                 │
+  │                  ✗ no gradient flows back                  │
+  │                                                            │
+  │  Reparameterized path (WORKS):                             │
+  │    ε ~ N(0,1)  (sample externally, treat as constant)     │
+  │    z = μ + σ · ε  (deterministic function of μ, σ)        │
+  │         ↑   ↑                                              │
+  │    ∂z/∂μ=1  ∂z/∂σ=ε   ← gradients exist!                 │
+  │                                                            │
+  │  Key insight: separates randomness (ε) from learnable     │
+  │  parameters (μ, σ). Converts a stochastic node into a     │
+  │  deterministic function of learnable params + external     │
+  │  noise. Backprop flows through μ and σ normally.           │
+  └────────────────────────────────────────────────────────────┘
+
   Loss = Reconstruction + KL Divergence
        = E[‖x - x̂‖²] + D_KL(q(z|x) ‖ p(z))
          ↑                    ↑
@@ -681,6 +766,31 @@ GAN Problems:
   Mode collapse:    Generator produces limited variety
   Training instability: Oscillations, non-convergence
   Evaluation:       Hard to measure quality (FID, IS scores)
+
+  Mode Collapse — the mechanism explained:
+  ┌────────────────────────────────────────────────────────────────────┐
+  │  The real data has many modes (e.g., all 10 digit classes).       │
+  │                                                                    │
+  │  1. Generator discovers that producing ONE high-quality output    │
+  │     (say, perfect "7"s) consistently fools the discriminator.     │
+  │     This is a LOCAL OPTIMUM — why risk variety when one mode      │
+  │     already achieves low loss?                                     │
+  │                                                                    │
+  │  2. Discriminator adjusts: learns to always reject "7"s.          │
+  │                                                                    │
+  │  3. Generator switches to a DIFFERENT single mode (e.g., "3"s).  │
+  │                                                                    │
+  │  4. This oscillation NEVER converges to the full distribution.    │
+  │     Generator cycles between modes rather than covering all.       │
+  │                                                                    │
+  │  Root cause: JS divergence (original GAN loss) gives zero         │
+  │  gradient when distributions don't overlap — no signal to         │
+  │  improve diversity, only to fool discriminator.                    │
+  │                                                                    │
+  │  WGAN fix: Wasserstein distance provides smooth, meaningful       │
+  │  gradients even when distributions don't overlap, guiding the     │
+  │  generator toward full distribution coverage.                      │
+  └────────────────────────────────────────────────────────────────────┘
 
   → Largely replaced by Diffusion Models for image generation (2022+)
   → But GAN concepts (adversarial training) still important:

@@ -240,6 +240,25 @@ The Kernel Trick — Handle Non-Linear Data:
     RBF/Gaussian: K = exp(-γ‖x - x'‖²)    ← most common
 
   Compute in high-D space WITHOUT actually transforming!
+
+  WHY only dot products? — The Dual Formulation:
+    The SVM optimization (maximize margin subject to constraints) is
+    reformulated via Lagrangian duality. In the dual problem, the
+    decision boundary depends ONLY on dot products ⟨xᵢ, xⱼ⟩ between
+    training points — never on individual feature vectors in the
+    transformed space. This is what makes kernels possible:
+
+      K(xᵢ, xⱼ) = ⟨φ(xᵢ), φ(xⱼ)⟩
+
+    computes the dot product in the high-dimensional space IMPLICITLY,
+    without ever computing φ(x) explicitly (which could be infinite-
+    dimensional for RBF).
+
+  Prediction uses only support vectors (αᵢ > 0):
+    f(x) = sign( Σᵢ αᵢ yᵢ K(xᵢ, x) + b )
+
+    Most αᵢ = 0 (non-support vectors don't affect the boundary).
+    Only the few points ON the margin matter → sparse, efficient.
 ```
 
 **When SVMs beat deep learning:** Small datasets, tabular data, when interpretability of margins matters.
@@ -355,9 +374,26 @@ Prediction:
 Why it works:
   - Each tree overfits differently (different data, different features)
   - Averaging reduces variance (errors cancel out)
-  - bias stays similar to individual trees
+  - Bias stays similar to individual trees
 
   "Many weak learners → one strong learner"
+
+Why Feature Randomization De-correlates Trees:
+  WITHOUT feature randomization:
+    All trees see all features → every tree splits on the SAME dominant
+    feature first (e.g., "income" for credit risk). Result: nearly
+    identical trees with highly correlated errors.
+
+  Problem with correlated estimators:
+    If trees have correlation ρ, then:
+      Var(avg of N trees) = ρσ² + (1-ρ)σ²/N
+    When ρ ≈ 1 (correlated): variance ≈ σ² (no reduction!)
+    When ρ ≈ 0 (uncorrelated): variance ≈ σ²/N (reduces by 1/N!)
+
+  Feature sampling (√p features per split) FORCES diversity:
+    Tree 1 might split on income first, Tree 2 on age, Tree 3 on
+    debt ratio → different tree structures → uncorrelated errors
+    → averaging actually reduces variance dramatically.
 ```
 
 ### Gradient Boosting (XGBoost, LightGBM, CatBoost)
@@ -383,6 +419,31 @@ Final:  F = Σ αᵢ Treeᵢ
 │ GPU support  │ ✓            │ ✓            │ ✓                   │
 │ Best for     │ General      │ Large data   │ Categorical-heavy   │
 ├──────────────┴──────────────┴──────────────┴─────────────────────┤
+│                                                                    │
+│  WHY they differ under the hood:                                   │
+│                                                                    │
+│  Split Finding:                                                    │
+│    XGBoost: Pre-sorted exact split — evaluates EVERY unique        │
+│    feature value as a candidate split point. Accurate but slow     │
+│    on high-cardinality features. O(n × features × unique_vals).    │
+│                                                                    │
+│    LightGBM: Histogram-based splitting — buckets continuous        │
+│    features into ~256 bins. Much faster & less memory because      │
+│    it only evaluates 256 candidate splits per feature, not         │
+│    millions. Slight accuracy tradeoff, but binning also acts       │
+│    as regularization.                                              │
+│                                                                    │
+│  Tree Growth Strategy:                                             │
+│    XGBoost (level-wise): Grows tree one full level at a time.      │
+│    Balanced trees, lower overfitting risk, but wastes splits       │
+│    on uninformative branches.                                      │
+│                                                                    │
+│    LightGBM (leaf-wise / best-first): Always splits the leaf       │
+│    with highest loss reduction. Faster convergence to lower        │
+│    loss, but can produce unbalanced trees that overfit on small    │
+│    data. Mitigate with max_depth or min_data_in_leaf.              │
+│                                                                    │
+├──────────────────────────────────────────────────────────────────┤
 │                                                                    │
 │  STILL THE CHAMPION FOR TABULAR DATA in 2026.                     │
 │  Deep learning has not clearly beaten gradient boosting            │
@@ -518,6 +579,10 @@ Explained Variance:
 │ Forest       │ Short path in tree → anomaly                     │
 │              │ Scales well, works with high dimensions          │
 ├──────────────┼──────────────────────────────────────────────────┤
+│ Local        │ Compares local density of a point to its         │
+│ Outlier      │ neighbors' densities. LOF ≈ 1 → normal density. │
+│ Factor (LOF) │ LOF >> 1 → lower relative density → outlier.    │
+├──────────────┼──────────────────────────────────────────────────┤
 │ One-Class    │ Learn boundary of normal data                    │
 │ SVM         │ Kernel-based, works with small normal datasets    │
 ├──────────────┼──────────────────────────────────────────────────┤
@@ -528,6 +593,29 @@ Explained Variance:
 │ LLM-based   │ Perplexity-based anomaly detection               │
 │              │ Unusual text patterns → high perplexity           │
 └──────────────┴──────────────────────────────────────────────────┘
+
+How Isolation Forest Works:
+  1. Randomly select a feature and a random split value
+  2. Partition data on that split; repeat recursively → builds a tree
+  3. Anomalies live in sparse regions, so they get isolated in
+     FEWER splits (shorter average path length from root to leaf)
+  4. Build many random trees; average path length → anomaly score
+     Short avg path = anomaly | Long avg path = normal
+
+  Why this is elegant: no density estimation, no distance metric,
+  O(n log n) per tree — scales to millions of points.
+
+How LOF Works:
+  1. For each point, find its k nearest neighbors
+  2. Compute local reachability density (inverse of avg distance
+     to neighbors, with smoothing)
+  3. Compare point's density to its neighbors' densities:
+     LOF(p) = avg(density of neighbor) / density(p)
+  4. LOF ≈ 1 → similar density to neighbors (inlier)
+     LOF >> 1 → much lower density than neighbors (outlier)
+
+  Advantage over global methods: detects outliers in varying-density
+  data (e.g., a sparse point near a dense cluster).
 
 Real-world applications:
   - Fraud detection (credit cards, transactions)
@@ -574,6 +662,28 @@ Feature engineering is often **more important than model choice** for classical 
 │  MISSING DATA:                                                    │
 │    Imputation:  mean, median, mode, KNN-based, model-based        │
 │    Indicator:   Add is_missing binary feature                     │
+│                                                                   │
+├──────────────────────────────────────────────────────────────────┤
+│                                                                   │
+│  WHEN & WHY — Decision Guidance:                                  │
+│                                                                   │
+│  Log transform → Right-skewed features (income, prices, counts).  │
+│    WHY: Compresses long tail, makes distribution more symmetric,  │
+│    helps linear models and distance-based methods (KNN, SVM).     │
+│                                                                   │
+│  One-hot encoding → Low-cardinality categoricals (< ~20 values).  │
+│    WHY: Creates interpretable binary columns. Avoid for high-     │
+│    cardinality (ZIP codes → 40K columns = sparse, slow, overfit). │
+│                                                                   │
+│  Target encoding → High-cardinality categoricals (ZIP codes,      │
+│    user IDs, product IDs). Replace category with mean of target.  │
+│    WHY: Single column instead of thousands. MUST regularize       │
+│    (smoothing, cross-val encoding) to prevent target leakage.     │
+│                                                                   │
+│  Interaction features → When domain knowledge suggests joint      │
+│    effects (e.g., price × quantity = revenue, age × income for    │
+│    credit risk). Trees find interactions automatically, but       │
+│    linear models NEED explicit interaction terms.                  │
 │                                                                   │
 └──────────────────────────────────────────────────────────────────┘
 ```

@@ -184,10 +184,12 @@ Lookup is just matrix indexing: embedding = E[token_id]
 
 **Weight tying:** Many models tie the input embedding matrix and the output projection matrix (the "LM head"). This means the same matrix is used to:
 
-1. Convert token IDs → embeddings (input)
-2. Convert final hidden states → logits over vocabulary (output)
+1. Convert token IDs → embeddings (input): multiply by E to map from token space to semantic space
+2. Convert final hidden states → logits over vocabulary (output): multiply by Eᵀ to map from semantic space back to token space
 
-This saves parameters (V × d can be significant: 32K × 4096 = 131M parameters) and provides a useful inductive bias.
+**Why this works (beyond just saving parameters):** The input embedding maps tokens _into_ a semantic space, and the output projection maps hidden states _back out_ to tokens. These are conceptually **inverse operations on the same space**. A token's embedding should be close (high dot product) to hidden states that should predict that token. Using the same matrix enforces this symmetry explicitly.
+
+Press & Wolf (2017) showed that weight tying consistently **improves** perplexity across model sizes — it's not just a memory optimization, it's a useful inductive bias. The parameter savings are also significant: for a 32K vocabulary with d_model=4096, the embedding matrix is 131M parameters, accounting for ~2% of a 7B model but ~10% of a 1B model.
 
 ---
 
@@ -208,6 +210,20 @@ CBOW (Continuous Bag of Words):       Skip-gram:
 
   Faster, good for frequent words      Slower, better for rare words
 ```
+
+### Training Word2Vec — Negative Sampling
+
+Training Word2Vec on the full vocabulary is impractical because the output softmax requires computing a dot product with _every_ word in the vocabulary (typically >100K words) for each training example.
+
+**Negative sampling** solves this by transforming the problem from multi-class classification to binary classification:
+
+1. For a (center word, context word) pair from the real data, label it as **positive** (1)
+2. Randomly sample k "noise" words from the vocabulary (typically k=5-15), and label them as **negative** (0)
+3. Train a binary classifier: $\sigma(v_w^T v_c) \approx 1$ for real context words, $\sigma(v_w^T v_n) \approx 0$ for random noise words
+
+Instead of computing a softmax over 100K words, you only compute k+1 sigmoid operations per training example. The noise words are sampled proportional to their frequency raised to the 3/4 power: $P(w) \propto f(w)^{3/4}$ — this slightly upweights rarer words to ensure they get used as negatives.
+
+This is what makes Word2Vec tractable on large corpora: the original Word2Vec paper trained on 1.6 billion words in hours, not weeks.
 
 ### The Embedding Space
 
@@ -235,6 +251,17 @@ Word embeddings capture semantic relationships as geometric relationships:
            └─────────────────────────────────────────┘
 ```
 
+**Why vector arithmetic captures analogies:**
+
+The Skip-gram objective implicitly factorizes a **Pointwise Mutual Information (PMI) matrix** — each dimension of the embedding captures a particular co-occurrence pattern between words. The relationship "king" → "queen" and "man" → "woman" involves the same systematic difference in co-occurrence contexts (e.g., appearing with "she/her" vs "he/him", "wife" vs "husband"). Because these context differences are consistent, they encode as a consistent direction in the embedding space.
+
+More concretely: if "king" and "queen" appear in the same contexts except for gendered words, and "man" and "woman" have the same pattern, then:
+
+- king - man ≈ the "gendered royalty" direction
+- woman + "gendered royalty" ≈ queen
+
+This breaks down for irregular relationships or when the training data doesn't have consistent contextual patterns. It also works best for frequent words with rich co-occurrence statistics.
+
 ### Limitations of Static Embeddings
 
 ```
@@ -251,7 +278,7 @@ Static (Word2Vec/GloVe):              Contextual (BERT/GPT):
 
 ## 3.7 Contextual Embeddings — How LLMs Create Them
 
-In a transformer, each layer refines the representation of each token based on its context:
+In a transformer, each layer refines the representation of each token based on its context through the self-attention mechanism:
 
 ```
 Input:  "The bank by the river was steep"
@@ -273,6 +300,16 @@ Layer 17-32 (later layers):
 This is the "residual stream" view: each layer ADDS information to the
 embedding via residual connections, progressively enriching it.
 ```
+
+**The mechanism in detail:** Self-attention creates contextual embeddings by computing a _weighted average_ of all token representations, with weights determined by relevance (the attention scores). Consider the word "bank":
+
+1. "bank" generates a **query** vector: "what context am I looking for?"
+2. Every other token ("The", "by", "river", "steep") generates **key** vectors: "here's what I offer as context"
+3. The dot product query·key determines how relevant each token is to "bank"
+4. "river" gets a high attention weight (very relevant), while "The" gets a lower weight
+5. The output is a weighted sum of value vectors, dominated by the most relevant tokens
+
+After layer 1, "bank" now contains information from its immediate neighbors. After layer 2, it contains information from _their_ neighbors (two hops away). By the final layer, each token's representation has been influenced by the entire sequence, with more influence from semantically relevant tokens. The same word "bank" in "bank account" would have "account" dominating the attention weights, pulling the representation toward the financial meaning instead.
 
 ---
 

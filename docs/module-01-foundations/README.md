@@ -56,7 +56,17 @@ ReLU                    GELU                    Sigmoid
   │                      │                        │
 ```
 
-**Why GELU matters for LLMs:** GELU (Gaussian Error Linear Unit) provides a smooth approximation to ReLU that weights inputs by their magnitude. It's the default in GPT-2, GPT-3, BERT, and most modern transformers because it avoids the hard cutoff of ReLU while maintaining similar computational properties.
+**Why GELU matters for LLMs:** GELU (Gaussian Error Linear Unit) is defined as:
+
+```
+GELU(x) = x · Φ(x)
+```
+
+where Φ(x) is the CDF of the standard normal distribution — i.e., the probability that a standard Gaussian random variable is ≤ x. Intuitively, each input is _scaled by its own percentile rank under a Gaussian_: highly positive values (high percentile) pass through almost unchanged, highly negative values (low percentile) are suppressed toward zero, and values near zero get partially dampened.
+
+This creates a **soft stochastic gate**: during training, you can interpret GELU as the expectation of multiplying the input by a Bernoulli mask whose probability depends on the input's magnitude. This provides implicit regularization — an effect similar to dropout, but continuous and deterministic.
+
+**Why it outperforms ReLU in transformers:** ReLU has a hard cutoff at zero with a non-smooth kink that can create optimization difficulties in deep networks. GELU's smoothness means gradients never abruptly vanish at the activation boundary. It's the default in GPT-2, GPT-3, BERT, and most modern transformers.
 
 ---
 
@@ -134,6 +144,55 @@ x ◄── ∂L/∂W₁ ◄── ∂L/∂z₁ ◄── ∂L/∂a₁ ◄──
 
 **Key insight:** Each layer only needs the gradient from the layer above it (∂L/∂a⁽ˡ⁾) to compute its own parameter gradients. This enables efficient computation in O(n) time where n is the number of layers.
 
+### Worked Numerical Example — Backprop Through a 2-Layer Network
+
+Let's walk through a tiny example with actual numbers to make gradient flow concrete.
+
+```
+Setup: 1 input, 1 hidden neuron (ReLU), 1 output (identity), MSE loss
+Weights: W₁ = 0.5, b₁ = 0.1, W₂ = -0.3, b₂ = 0.2
+Input:  x = 2.0,  Target: y = 1.0
+
+═══ FORWARD PASS ═══
+
+Hidden layer:
+  z₁ = W₁·x + b₁ = 0.5·2.0 + 0.1 = 1.1
+  a₁ = ReLU(1.1) = 1.1
+
+Output layer:
+  z₂ = W₂·a₁ + b₂ = -0.3·1.1 + 0.2 = -0.13
+  ŷ  = z₂ = -0.13  (identity activation)
+
+Loss:
+  L = ½(y - ŷ)² = ½(1.0 - (-0.13))² = ½(1.13)² = 0.638
+
+═══ BACKWARD PASS ═══
+
+Output gradient:
+  ∂L/∂ŷ = -(y - ŷ) = -(1.0 - (-0.13)) = -1.13
+  ∂L/∂z₂ = ∂L/∂ŷ · 1  = -1.13  (identity activation derivative = 1)
+
+Gradients for W₂, b₂:
+  ∂L/∂W₂ = ∂L/∂z₂ · a₁ = -1.13 · 1.1 = -1.243
+  ∂L/∂b₂ = ∂L/∂z₂ · 1  = -1.13
+
+Propagate to hidden layer:
+  ∂L/∂a₁ = ∂L/∂z₂ · W₂ = -1.13 · (-0.3) = 0.339
+  ∂L/∂z₁ = ∂L/∂a₁ · ReLU'(z₁) = 0.339 · 1 = 0.339  (z₁=1.1 > 0)
+
+Gradients for W₁, b₁:
+  ∂L/∂W₁ = ∂L/∂z₁ · x = 0.339 · 2.0 = 0.678
+  ∂L/∂b₁ = ∂L/∂z₁ · 1 = 0.339
+
+Update (lr = 0.1):
+  W₁ ← 0.5  - 0.1·0.678  = 0.432
+  b₁ ← 0.1  - 0.1·0.339  = 0.066
+  W₂ ← -0.3 - 0.1·(-1.243) = -0.176
+  b₂ ← 0.2  - 0.1·(-1.13)  = 0.313
+```
+
+Notice how each gradient depends on the chain of derivatives from the loss all the way back. If any factor in the chain is very small (e.g., sigmoid derivative ≤ 0.25), the gradient shrinks at every layer — this is the vanishing gradient problem.
+
 ### Vanishing & Exploding Gradients
 
 When networks are deep, gradients can:
@@ -179,6 +238,24 @@ Intuition:
   → vanished!        → stable ✓          → exploded!
 ```
 
+**The signal propagation argument (why variance scaling works):**
+
+Consider a single layer: y = Wx where x has n input dimensions. If we assume inputs and weights are independent with zero mean, then:
+
+```
+Var(yⱼ) = n · Var(wᵢⱼ) · Var(xᵢ)
+```
+
+To keep the output variance equal to the input variance across layers (Var(y) = Var(x)), we need:
+
+```
+n · Var(w) = 1   →   Var(w) = 1/n
+```
+
+This is exactly the LeCun initialization. Xavier extends this to account for both forward and backward variance stability: Var(w) = 2/(n_in + n_out). He initialization uses Var(w) = 2/n_in because ReLU zeros out roughly half the neurons, effectively halving the number of active inputs.
+
+**What happens without proper initialization:** In a 50-layer network with Var(w) = 1 (too large), the activation variance multiplies by ~n at each layer. With n=512, after just 10 layers the variance would be 512¹⁰ ≈ 10²⁷ — complete numerical overflow. Conversely, with Var(w) = 0.001 (too small), variance decays geometrically to zero and all gradients vanish.
+
 For transformers specifically, a common practice is to scale the residual connection initialization by `1/√(2N)` where N is the number of layers, preventing the residual stream from growing too large in deep networks.
 
 ### Batch Normalization vs Layer Normalization
@@ -220,6 +297,10 @@ RMSNorm (used in LLaMA, Gemma):
   where RMS(x) = √(1/d Σ xᵢ²)
   ~10% faster than LayerNorm, similar quality
 ```
+
+**Why RMSNorm works without mean centering:** LayerNorm subtracts the mean and divides by the standard deviation, but empirical studies show that the re-centering (mean subtraction) contributes very little to the normalization benefit — it's the _re-scaling_ (dividing by the magnitude) that matters most for training stability. Since LayerNorm already has learned shift parameter β, the mean subtraction is redundant: β can absorb any necessary centering.
+
+RMSNorm removes the mean computation entirely, using just the root mean square: RMS(x) = √(1/d · Σ xᵢ²). This saves ~10-15% compute because computing the mean requires an extra reduction across the feature dimension. LLaMA and LLaMA 2 demonstrated that RMSNorm produces equivalent quality to LayerNorm at every scale tested, making it the de facto choice for modern LLM architectures.
 
 ---
 
@@ -266,6 +347,16 @@ v̂ = v / (1 - β₂ᵗ)
 
 - Decouples weight decay from the gradient update
 - Standard for LLM training (GPT, LLaMA, etc.)
+
+**Why L2 regularization ≠ weight decay in Adam (and why this matters):**
+
+With vanilla SGD, adding an L2 penalty λ‖w‖² to the loss produces the same update as weight decay (multiplying weights by (1-λ) each step). But with Adam, this equivalence **breaks down**:
+
+- **L2 regularization in Adam:** The gradient of the L2 term (2λw) gets processed by Adam's adaptive learning rate — divided by √v̂. Parameters with large historical gradients get _less_ regularization, and parameters with small historical gradients get _more_. This is inconsistent and unintended.
+
+- **AdamW (decoupled weight decay):** Applies weight decay _directly_ to the weights, bypassing Adam's adaptive scaling: θ ← θ(1 - ηλ) - η·m̂/(√v̂+ε). Every parameter gets the same proportional decay regardless of its gradient history.
+
+In practice, this distinction affects training stability and generalization in LLMs significantly. Loshchilov & Hutter (2017) showed that decoupled weight decay produces better generalization across all learning rates tested.
 
 ### Learning Rate Schedules
 

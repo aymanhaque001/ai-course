@@ -118,6 +118,32 @@ If serving 1B requests:
 
 This is why LLaMA 3 8B was trained on 15T tokens instead of ~160B (Chinchilla-optimal):
   The inference savings across deployment lifetime overwhelm the extra training compute.
+
+The Conceptual Leap Beyond Chinchilla:
+  Chinchilla optimizes: min L(N, D)  subject to  C_train = 6·N·D
+  It asks: "Given a training budget, what's the best model?"
+
+  Inference-adjusted scaling optimizes TOTAL cost across the model's lifetime:
+    C_total = C_train + N_queries × C_infer(M)
+
+  Where:
+    C_train  = one-time cost to train the model (6·N·D FLOPs)
+    N_queries = total inference requests over the model's deployment lifetime
+    C_infer(M) = per-query cost, proportional to model size M
+
+  The key insight: in production, inference dominates.
+    If N_queries = 10⁹ and C_infer(70B) = 10× C_infer(7B):
+      70B: C_total = C_train + 10⁹ × 10x = dominated by inference
+       7B: C_total = C_train' + 10⁹ × 1x = much cheaper total
+      (even if C_train' > C_train due to longer training on more tokens)
+
+  This shifts the optimal point toward SMALLER, BETTER-TRAINED models:
+    Chinchilla-optimal 70B (20 tok/param) → Inference-optimal 8B (1875 tok/param)
+    The extra training tokens are a one-time cost; the inference savings compound
+    across every single query for the lifetime of the model.
+
+  This explains the industry trend: LLaMA 3, Mistral, Gemma all train small
+  models far beyond Chinchilla-optimal ratios for deployment efficiency.
 ```
 
 ---
@@ -227,6 +253,33 @@ Quantization methods:
 │    Better quality than PTQ, requires retraining               │
 │    Used in: BitNet b1.58 (1.58-bit weights!)                  │
 └────────────────────────────────────────────────────────────────┘
+
+AWQ vs GPTQ — Why They Differ:
+
+  GPTQ (Frantar et al., 2022):
+    Quantizes weights column-by-column within each layer, using second-order
+    (Hessian) information: H = 2·Xᵀ·X from calibration data.
+    Key idea: after quantizing column j, propagate the rounding error to
+    remaining columns using the inverse Hessian (Cholesky decomposition).
+    Minimizes ||WX - W_qX||² (layer output reconstruction error).
+    Strength: mathematically optimal error compensation per layer.
+
+  AWQ (Lin et al., 2023):
+    Key observation: ~1% of weights are disproportionately important, but
+    importance is determined by ACTIVATION magnitude, not weight magnitude.
+    A small weight w multiplied by a large activation x contributes more
+    to the output (w·x) than a large weight multiplied by a tiny activation.
+
+    Method: identify salient weight channels (those multiplied by large
+    activations in calibration data), then apply per-channel scaling to
+    protect them before quantization:
+      w' = w · s,  x' = x / s   (output unchanged: w'·x' = w·x)
+    Choosing s > 1 for salient channels reduces their relative quantization
+    error at the cost of slightly more error on non-salient channels.
+
+    Result: AWQ typically preserves quality better than GPTQ at the same
+    bit-width because it focuses protection where it actually matters
+    (activation-weighted importance), not just where weight magnitudes are large.
 ```
 
 ### Quantization Error
@@ -310,6 +363,24 @@ Speculative Decoding:
 
   Speedup: 2-4× for free (exact same distribution as standard decoding)
   Requirement: small and big model must share vocabulary
+
+  Correctness Guarantee (Rejection Sampling):
+  For each draft token t at position i:
+    Let p_large = P_big(t), p_small = P_draft(t)
+
+    Case 1: p_large(t) ≥ p_small(t)  →  Accept unconditionally.
+            The big model is at least as likely to produce this token.
+
+    Case 2: p_large(t) < p_small(t)  →  Accept with probability p_large(t) / p_small(t).
+            Otherwise, reject and resample from corrected distribution:
+              P_corrected(t) = max(0, p_large(t) - p_small(t))  (then renormalize)
+            This is the distribution (p_large - p_small)⁺ / Z.
+
+  Why this works: This is classical rejection sampling. The acceptance/rejection
+  scheme provably recovers the large model's EXACT output distribution — every
+  token produced has exactly the same probability as if you ran the large model
+  alone. There is zero quality loss. The draft model only affects speed (higher
+  acceptance rate = more tokens per big-model forward pass), never correctness.
 
 Example: Claude uses "Haiku" draft + "Sonnet" target, Meta uses 68M draft + 70B target
 ```
@@ -409,6 +480,31 @@ L_balance = α × num_experts × Σᵢ (fraction_i × mean_gate_i)
 Where fraction_i = fraction of tokens routed to expert i
       mean_gate_i = mean softmax gate value for expert i
 Target: uniform distribution across experts
+
+The Rich-Get-Richer Problem (Expert Collapse):
+  Early in training, router weights are near-random. By chance, one expert
+  may perform slightly better on a batch. What happens next:
+    1. Router learns to send more tokens to that expert (higher gate values)
+    2. That expert receives more gradient updates and improves further
+    3. Other experts receive fewer tokens → fewer gradients → stagnate
+    4. Router sends even more tokens to the winning expert
+    → Positive feedback loop: most experts become "dead" (unused)
+    → "Expert collapse": N experts trained, but only 1-2 actually used
+    → Model degenerates to a dense model with wasted parameters
+
+  Formally, the auxiliary loss:
+    L_aux = N × Σᵢ fᵢ · Pᵢ
+  where:
+    N = number of experts
+    fᵢ = fraction of tokens routed to expert i  (discrete, non-differentiable)
+    Pᵢ = average router probability for expert i (continuous, differentiable)
+
+  If tokens are uniformly distributed: fᵢ = 1/N, Pᵢ = 1/N → L_aux = 1/N × N = 1
+  If all tokens go to one expert: f₁ = 1, P₁ ≈ 1 → L_aux ≈ N (heavily penalized)
+
+  The product fᵢ · Pᵢ is key: it's differentiable through Pᵢ while tracking
+  actual routing through fᵢ, pushing the router toward uniform utilization.
+  Typical α = 0.01 to avoid overwhelming the main language modeling loss.
 ```
 
 ---
@@ -430,6 +526,33 @@ Continuous batching (vLLM):
   Process tokens in a stream, dynamically insert/remove requests.
   No padding waste; throughput 3-5× better than naive batching.
   PagedAttention: manage KV cache like OS virtual memory (paged allocation).
+
+PagedAttention in Detail:
+  Traditional KV-cache problem:
+    Pre-allocates contiguous memory for the maximum sequence length (e.g., 4096)
+    for every request, even if a request only generates 50 tokens.
+    → Massive internal fragmentation: most allocated memory sits unused.
+    → Cannot serve as many concurrent requests as GPU memory allows.
+
+  PagedAttention solution (Kwon et al., 2023):
+    Stores KV-cache in fixed-size non-contiguous "pages" (blocks), just like
+    how an OS manages virtual memory with page tables.
+
+    ┌──────────┐     Page Table        Physical Pages (GPU HBM)
+    │ Request A│ ──→ [0→P5, 1→P2, 2→P9]  ──→  scattered in memory
+    │ (3 pages)│                               no contiguous requirement
+    ├──────────┤
+    │ Request B│ ──→ [0→P1, 1→P7]       ──→  only allocates what's needed
+    │ (2 pages)│
+    └──────────┘
+
+    Benefits:
+    - Eliminates internal fragmentation: allocate pages on demand as sequence grows
+    - Eliminates external fragmentation: pages need not be contiguous
+    - Memory sharing: parallel sequences (beam search, parallel sampling) can
+      share physical pages for their common prefix via copy-on-write
+    - Near-optimal memory utilization: waste < 4% vs ~60-80% with pre-allocation
+    - Enables 2-4× more concurrent requests on the same GPU
 ```
 
 ### Tensor Parallelism for Serving

@@ -81,6 +81,7 @@ LLaMA 3        15T+               ~50+ TB
 ```
 
 **Data quality pipeline:**
+
 ```
 Raw web crawl → Language detection → Deduplication → Quality filtering → Toxicity filtering → Final dataset
                      │                    │                │                   │
@@ -130,6 +131,47 @@ Training a 70B+ model on a single GPU is impossible. Modern pre-training uses mu
 └─────────────────────────────────────────────────────────────────┘
 ```
 
+### How Tensor Parallelism Actually Works
+
+Tensor parallelism splits individual matrix operations across GPUs within a single layer. Here is exactly how each component is split:
+
+```
+Feed-Forward Network (FFN) — Column + Row Split:
+
+  FFN(x) = W2 · GeLU(W1 · x)
+
+  W1 split COLUMN-WISE (each GPU computes part of the hidden dimension):
+    ┌──────────┐      ┌─────┐        ┌─────┐
+    │          │      │W1_a │→GPU 0→ │h_a  │  (partial hidden)
+    │  Input x │ ──── │     │        │     │
+    │          │      │W1_b │→GPU 1→ │h_b  │  (partial hidden)
+    └──────────┘      └─────┘        └─────┘
+                                       │  GeLU applied independently (no communication)
+                                       ▼
+  W2 split ROW-WISE (each GPU has rows matching its hidden partition):
+    ┌─────┐         ┌─────┐
+    │h_a  │→ W2_a → │out_a│──┐
+    │     │         │     │  │  AllReduce (sum)
+    │h_b  │→ W2_b → │out_b│──┘──→ final output
+    └─────┘         └─────┘
+
+  Only ONE AllReduce per FFN layer — minimal communication!
+
+Attention — Split by Heads:
+  Q, K, V projection matrices split so each GPU owns a subset of heads:
+    GPU 0: heads 0-3   (Q₀₋₃, K₀₋₃, V₀₋₃)
+    GPU 1: heads 4-7   (Q₄₋₇, K₄₋₇, V₄₋₇)
+  Each GPU computes attention independently for its heads.
+  Output projection O is split row-wise → AllReduce combines results.
+
+Communication pattern per transformer layer:
+  2 AllReduce ops (one in attention, one in FFN)
+
+Best practice: TP works best WITHIN a single node (8 GPUs connected
+by NVLink at 600+ GB/s). Across nodes (network at ~50 GB/s),
+the AllReduce latency dominates — use Pipeline Parallelism instead.
+```
+
 ### Mixed Precision Training
 
 ```
@@ -146,6 +188,52 @@ Modern LLM training uses BF16 because:
 Master weights kept in FP32 for accumulation stability.
 ```
 
+### Why FP16 Alone Causes Problems (and How Loss Scaling Fixes It)
+
+FP16 has only **5 exponent bits**, giving it a dynamic range of roughly ±65,504. This creates two critical failure modes during training:
+
+```
+Problem 1: Gradient Underflow
+  Many gradients during backpropagation are very small (e.g., 1e-7, 1e-8).
+  FP16's smallest positive normal value is ~6.1e-5.
+
+  Gradient value:    1e-7
+  FP16 representation: 0.0  ← UNDERFLOWED TO ZERO!
+
+  When gradients become zero, those parameters stop learning entirely.
+  This is especially common in early layers of deep networks.
+
+Problem 2: Overflow in Accumulation
+  Large activation values can exceed 65,504 → become inf → NaN propagates.
+
+Solution: Loss Scaling
+  ┌──────────────────────────────────────────────────────────────┐
+  │  1. Multiply loss by a large scale factor S (e.g., 1024)    │
+  │     L_scaled = L × S                                        │
+  │                                                              │
+  │  2. Backward pass computes gradients in FP16                 │
+  │     Gradients are also scaled by S (chain rule)              │
+  │     1e-7 × 1024 = 1.024e-4 → representable in FP16! ✓      │
+  │                                                              │
+  │  3. Before updating weights, divide gradients by S           │
+  │     grad_FP32 = grad_FP16 / S                               │
+  │                                                              │
+  │  4. Update FP32 master weights with the unscaled gradients   │
+  │     W_FP32 = W_FP32 - lr × grad_FP32                        │
+  │                                                              │
+  │  5. Copy updated FP32 weights back to FP16 for next forward  │
+  └──────────────────────────────────────────────────────────────┘
+
+  Dynamic loss scaling: Start with a large S (e.g., 2^16). If overflow
+  occurs (inf/NaN in gradients), halve S and skip the update. If no
+  overflow for N steps, double S. This auto-tunes the scale factor.
+
+Why BF16 avoids most of these issues:
+  BF16 has 8 exponent bits → same range as FP32 (±3.4e38)
+  Gradient underflow almost never happens, so loss scaling is
+  often unnecessary. This is why BF16 is preferred for modern training.
+```
+
 ---
 
 ## 4.3 Stage 2: Supervised Fine-Tuning (SFT)
@@ -157,9 +245,12 @@ SFT transforms a base model (text completion) into a chat model (instruction fol
 ```json
 {
   "messages": [
-    {"role": "system", "content": "You are a helpful assistant."},
-    {"role": "user", "content": "Explain quantum computing in simple terms."},
-    {"role": "assistant", "content": "Quantum computing uses quantum bits (qubits) that can exist in multiple states simultaneously..."}
+    { "role": "system", "content": "You are a helpful assistant." },
+    { "role": "user", "content": "Explain quantum computing in simple terms." },
+    {
+      "role": "assistant",
+      "content": "Quantum computing uses quantum bits (qubits) that can exist in multiple states simultaneously..."
+    }
   ]
 }
 ```
@@ -176,6 +267,7 @@ This ensures the model learns to GENERATE good responses, not to predict user me
 ```
 
 **Typical hyperparameters for SFT:**
+
 - Learning rate: 1e-5 to 2e-5 (10-100× lower than pre-training)
 - Epochs: 2-5 (small dataset, don't overtrain)
 - Batch size: 32-128
@@ -215,6 +307,7 @@ Full fine-tuning:                    LoRA:
 ```
 
 **LoRA hyperparameters:**
+
 - **r (rank):** 4-64. Higher = more capacity, more parameters
 - **α (scaling):** Scales the LoRA output. Effective scaling = α/r
 - **Target modules:** Usually Q, K, V, O projections. Can also include FFN
@@ -284,6 +377,39 @@ Step 3: Optimize policy with PPO
   └───────────────────────────────────────────────────────────┘
 ```
 
+### PPO: The RL Algorithm Inside RLHF
+
+PPO (Proximal Policy Optimization) replaced vanilla policy gradient in RLHF because naive policy gradient updates can be catastrophically large — a single bad update can destroy a model that took weeks to train. PPO solves this with a **clipped surrogate objective** that creates a "trust region" around the current policy:
+
+```
+PPO Clipped Objective:
+
+  L_PPO = E_t [ min( r_t(θ) · A_t,  clip(r_t(θ), 1-ε, 1+ε) · A_t ) ]
+
+  Where:
+    r_t(θ) = π_θ(aₜ|sₜ) / π_θ_old(aₜ|sₜ)    ← probability ratio (new policy / old policy)
+    A_t    = advantage estimate                 ← how much better this action was than average
+    ε      = clipping parameter (typically 0.2) ← controls maximum policy change per update
+
+  How the clip works:
+    ┌──────────────────────────────────────────────────────────────┐
+    │  If r_t > 1+ε (policy moved too far in positive direction): │
+    │    clip caps the objective → no further gradient push        │
+    │                                                              │
+    │  If r_t < 1-ε (policy moved too far in negative direction): │
+    │    clip caps the objective → no further gradient push        │
+    │                                                              │
+    │  If 1-ε ≤ r_t ≤ 1+ε (within trust region):                 │
+    │    normal policy gradient update proceeds                    │
+    └──────────────────────────────────────────────────────────────┘
+
+  Why PPO replaced vanilla policy gradient for RLHF:
+    1. Stability: Vanilla PG can take huge steps that collapse the model
+    2. Sample efficiency: PPO reuses samples within the trust region
+    3. Simplicity: Easier to tune than TRPO (no conjugate gradient needed)
+    4. Bounded updates: The clip guarantees no single update destroys the policy
+```
+
 ### Why KL Penalty?
 
 ```
@@ -324,6 +450,40 @@ Where:
 ```
 
 **Intuition:** DPO increases the probability of preferred responses relative to the reference model, while decreasing the probability of dispreferred responses. The implicit reward is the log-ratio of policy to reference probabilities.
+
+### Why DPO Works Without a Reward Model
+
+DPO is not a heuristic — it is an **analytical solution** to the same RLHF objective. Here is the derivation:
+
+```
+Step 1: The RLHF objective is:
+  max_π E[R(x,y)] - β·KL(π ‖ π_ref)
+
+Step 2: This has a closed-form optimal solution:
+  π*(y|x) = (1/Z(x)) · π_ref(y|x) · exp(R(x,y) / β)
+
+Step 3: Rearranging for the reward function:
+  R(x,y) = β · log(π*(y|x) / π_ref(y|x)) + β·log Z(x)
+
+  This is the KEY insight: the reward is implicitly defined by
+  the log-ratio between the optimal policy and the reference policy:
+
+    r(x,y) = β · log π_θ(y|x) / π_ref(y|x)    (up to a constant)
+
+Step 4: Substitute this implicit reward into the Bradley-Terry
+  preference model P(y_w ≻ y_l) = σ(r(y_w) - r(y_l)):
+
+  P(y_w ≻ y_l) = σ(β · [log π_θ(y_w|x)/π_ref(y_w|x) - log π_θ(y_l|x)/π_ref(y_l|x)])
+
+Step 5: Maximize the log-likelihood of human preferences directly:
+  L_DPO = -E[log σ(β · (log π_θ(y_w|x)/π_ref(y_w|x) - log π_θ(y_l|x)/π_ref(y_l|x)))]
+
+  Result: A loss function that optimizes the POLICY directly from
+  preference pairs — no reward model, no RL loop, no PPO instabilities.
+  The reward model is "folded into" the policy itself.
+```
+
+This is why the DPO paper is titled "Your Language Model is Secretly a Reward Model" — the policy _is_ the reward model, and you can extract reward scores as `β · log π_θ(y|x)/π_ref(y|x)` at any time.
 
 ```
 ┌────────────────────────────────────────────┐
@@ -381,6 +541,72 @@ Used by Anthropic for Claude's alignment:
 │  Key insight: Uses a "constitution" (set of      │
 │  principles) to guide the critique & revision    │
 └─────────────────────────────────────────────────┘
+```
+
+### Concrete CAI Walkthrough: From Harmful Response to Training Example
+
+Here is exactly how a single training example is generated through the Constitutional AI pipeline, eliminating the need for human harmlessness labels:
+
+```
+━━━ Step 1: Elicit a harmful response ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  User prompt:  "How can I hack into someone's email account?"
+
+  Initial model response (from the helpful-only SFT model):
+    "You could try phishing attacks — create a fake login page
+     that looks like Gmail, send it to them via email, and when
+     they enter their password, you'll capture it. Another method
+     is to try common passwords or use credential stuffing..."
+
+━━━ Step 2: Critique using constitutional principles ━━━━━━━━━━━━━━━
+
+  The MODEL is prompted (not a human):
+    "Read the assistant's response. Identify specific ways this
+     response could be harmful, unethical, or illegal. Consider
+     the principle: 'The assistant should not help with activities
+     that are illegal or could harm others.'"
+
+  Model-generated critique:
+    "This response provides specific technical methods for
+     unauthorized access to someone's private email, which is:
+     1. A federal crime (Computer Fraud and Abuse Act)
+     2. Could enable stalking, identity theft, or harassment
+     3. Teaches social engineering techniques (phishing) that
+        could be used against many victims
+     The response should refuse and suggest legitimate alternatives."
+
+━━━ Step 3: Revise based on the critique ━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  The MODEL is prompted:
+    "Given your critique, rewrite the response to be helpful
+     while avoiding the identified harms."
+
+  Model-generated revision:
+    "I can't help with hacking into someone else's email — that's
+     unauthorized access and is illegal. If you've lost access to
+     YOUR OWN account, here's what to do:
+     1. Use the 'Forgot password' recovery flow
+     2. Contact the email provider's support team
+     3. Use backup codes if you set up 2FA
+     If you're concerned about email security, I can explain
+     how to protect your own account with strong passwords and 2FA."
+
+━━━ Step 4: Create training pair ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  Preferred (y_w):  The revised response       ← generated by AI
+  Rejected (y_l):   The initial response        ← generated by AI
+
+  This pair goes into RLHF/DPO training WITHOUT any human labeler
+  having to read or rank harmful content.
+
+━━━ Why this works at scale ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  • Generate 100K+ preference pairs automatically
+  • The "constitution" is a set of ~15 principles (be harmless,
+    be honest, don't help with illegal activities, etc.)
+  • Each principle is inserted into critique prompts as context
+  • Multiple rounds of critique-revision can further improve quality
+  • Humans only write the principles, not individual labels
 ```
 
 ---
@@ -511,6 +737,7 @@ Typical recipe:
            'accuracy': accuracy.item()
        }
    ```
+
    </details>
 
 7. **Write code to set up LoRA fine-tuning for a LLaMA model using the PEFT library.**
@@ -581,6 +808,7 @@ Typical recipe:
    # model = PeftModel.from_pretrained(base_model, "./lora-adapter")
    # merged = model.merge_and_unload()  # Merge LoRA into base weights
    ```
+
    </details>
 
 ### System Design
@@ -601,6 +829,7 @@ Typical recipe:
 ---
 
 ## Key Papers
+
 - Radford et al. (2018) — "Improving Language Understanding by Generative Pre-Training" (GPT)
 - Ouyang et al. (2022) — "Training language models to follow instructions with human feedback" (InstructGPT/RLHF)
 - Hu et al. (2021) — "LoRA: Low-Rank Adaptation of Large Language Models"

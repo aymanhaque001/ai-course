@@ -166,6 +166,47 @@ Data Storage Options:
   DVC handles the mapping: git commit → data version
 ```
 
+### Data Versioning — Schema Evolution
+
+```
+When data schemas change (columns added/removed, types changed), models
+trained on the old schema can break silently in production.
+
+Common schema change scenarios:
+  - New feature column added to upstream data warehouse
+  - Column renamed (user_id → customer_id)
+  - Type change (string "1.5" → float 1.5, or int → nullable int)
+  - Feature removed (deprecated data source shut down)
+  - New category value added to a categorical feature (unseen by model)
+
+Solutions:
+  (1) Schema Registry (e.g., Confluent Schema Registry, AWS Glue Schema Registry)
+        Enforce backward compatibility: new schemas must be readable by
+        models expecting the old schema (additive changes only).
+        Breaking changes require a new schema version and an explicit migration.
+
+  (2) Feature Deprecation Policy
+        Mark old features as deprecated → alert all dependent models/teams
+        → allow a migration period (e.g., 30 days)
+        → confirm no active models read the feature → then remove.
+        Never silently drop features from a live pipeline.
+
+  (3) Schema Validation in CI
+        Read the model's expected input schema from the registry.
+        On every PR that touches a data pipeline:
+          - Assert the new pipeline output matches the registered schema.
+          - Fail CI if any required field is missing, renamed, or type-changed.
+        Catches silent breakage before it reaches production.
+
+  (4) Feature Versioning
+        Decouple schema evolution from model update cycles:
+          user_spend_v1  →  original computation (still active)
+          user_spend_v2  →  new computation logic (gradual adoption)
+        Models explicitly declare which version they depend on.
+        Multiple versions coexist in the feature store during migration.
+        Each consumer migrates on its own timeline without forced coordination.
+```
+
 ### Data Quality
 
 ```
@@ -236,6 +277,80 @@ Why Feature Stores Matter:
   - Reusability: same features shared across models/teams
   - Point-in-time correctness: avoid data leakage
   - Low latency: pre-computed features for real-time serving
+  - Offline/Online consistency: same transformation code used for both stores
+```
+
+### Offline/Online Store Consistency
+
+```
+The dual-store pattern creates a critical consistency challenge:
+
+  Offline store: batch jobs (Spark) compute features; results may be hours old.
+                 Used for: model training, batch scoring pipelines.
+  Online store:  pre-computed features served in <5 ms (Redis/DynamoDB).
+                 Used for: real-time inference at request time.
+
+  Risk: if the two pipelines compute the same feature with slightly different
+        logic, the model trains on data it never sees in serving → silent failure.
+
+  Point-in-time correctness (offline training data):
+    The offline pipeline must compute features as they *would have been* at
+    training time — using no data from after the label cutoff (data leakage).
+    e.g., "user_purchases_7d" for a Jan 1 training example must count only
+    purchases before Jan 1, not purchases that happened after.
+
+  Solutions:
+    (1) Single transformation library: same function executes online (Python
+        at request time) and offline (PySpark batch), eliminating dual-
+        implementation drift at the source.
+    (2) Backfill: when online feature logic changes, re-run the batch pipeline
+        to backfill the offline store before triggering a model retrain.
+    (3) Integration tests: compute features for N sample entity keys both online
+        (Redis lookup) and offline (batch recompute); assert values match within
+        an acceptable tolerance on every deployment.
+```
+
+### Training-Serving Skew
+
+```
+Training-serving skew is the #1 cause of silent ML failures in production.
+
+The model performs well in offline evaluation but unexpectedly poorly in
+production because the features at inference time differ from training time.
+
+Causes:
+  (1) Feature computation differences
+        Train:  pandas one-liner on a DataFrame column
+        Serve:  different SQL query — same intent, subtly different result
+                (e.g., NULL handling, rounding, time zone offset)
+  (2) Data preprocessing mismatches
+        Train:  StandardScaler.fit_transform(X_train)  ← fits on training set
+        Serve:  raw feature passed directly to model   ← scaler never loaded!
+  (3) Library version differences
+        scikit-learn 1.1 → 1.3 changed default hyperparameters;
+        numpy dtype handling changed across versions; silent numeric drift.
+  (4) Stale features (feature store TTL expired)
+        Feature store key expires; model receives fallback value (0 or null).
+        Model trained only on fresh features → distribution shifts silently.
+  (5) Schema mismatches between training and serving pipelines
+        New feature column added to training; serving pipeline not updated.
+
+Detection:
+  - Log feature vectors at both training time and inference time.
+  - Compare feature distributions between training logs and live serving
+    logs using PSI or KS test on a sampled window of production traffic.
+  - Shadow mode: run new pipeline on live traffic and compare feature
+    statistics to the production pipeline before any go-live.
+  - Integration test: given identical raw input, assert training pipeline
+    and serving pipeline produce identical feature vectors.
+
+Prevention:
+  - Feature store (Feast/Tecton): one computation, served identically to
+    both training jobs and real-time inference.
+  - Serialize ALL preprocessing objects (scalers, encoders, imputers)
+    as model artifacts; load them at serve time — never refit on production.
+  - Pin library versions in both training and serving containers (same image).
+  - Add automated feature-value comparison tests to CI on every deploy.
 ```
 
 ---
@@ -388,6 +503,48 @@ Model Registry (MLflow / W&B):
 └──────────────────────────────────────────────────────────────────┘
 ```
 
+### Retraining Triggers — Code Changes vs Data Changes
+
+```
+Two fundamentally different situations require very different responses:
+
+  CODE CHANGE (bug fix, new model architecture, dependency update)
+  → Standard CI/CD pipeline — NO retraining needed:
+      lint → unit test → integration test → build container → deploy
+      Model weights are unchanged; the fix is in code, not learned parameters.
+
+  DATA CHANGE or DRIFT (distribution shift, new patterns, concept drift)
+  → Trigger the retraining pipeline:
+      detect drift → pull fresh training data → re-run training job
+      → evaluate new model → compare against current production model
+      → promote if new model wins on holdout eval; keep current if not.
+
+Trigger types:
+  ┌─────────────────┬──────────────────────────────────────────────┐
+  │ Schedule-based  │ Retrain weekly/monthly as a safety net.       │
+  │                 │ Catches slow drift even if no alert fires.    │
+  ├─────────────────┼──────────────────────────────────────────────┤
+  │ Event-based     │ Drift detector fires (PSI > 0.25, KS p<0.05).│
+  │                 │ Business metric drops beyond alert threshold. │
+  │                 │ Immediately triggers the retraining pipeline. │
+  ├─────────────────┼──────────────────────────────────────────────┤
+  │ Manual          │ Domain expert confirms distribution changed   │
+  │                 │ (product launch, regulatory change, new       │
+  │                 │  market segment onboarded).                   │
+  └─────────────────┴──────────────────────────────────────────────┘
+
+Promotion gate (data-triggered retraining):
+  The retrained model must outperform the production model on:
+    - Offline holdout set (same evaluation metrics used during training)
+    - Shadow mode on live traffic (compare outputs against production model)
+  If new model wins → canary → progressive rollout → full promotion.
+  If new model is worse → do NOT promote; investigate data quality issues.
+
+Clean pipeline routing:
+    git push (code change)   → code CI/CD branch   → deploy (no retrain)
+    drift alert (data change) → retraining branch  → eval → conditional deploy
+```
+
 ---
 
 ## 15.7 Monitoring & Observability
@@ -456,6 +613,24 @@ Detection Methods:
     PSI < 0.1:  No significant drift
     PSI 0.1-0.25: Moderate drift (investigate)
     PSI > 0.25: Severe drift (retrain!)
+
+  Worked Numerical Example (PSI):
+    Training distribution bin %:   [0.20, 0.30, 0.30, 0.20]
+    Production distribution bin %: [0.25, 0.35, 0.25, 0.15]
+
+    PSI = Σ (A_i − E_i) · ln(A_i / E_i)
+        = (0.25−0.20)·ln(0.25/0.20) + (0.35−0.30)·ln(0.35/0.30)
+        + (0.25−0.30)·ln(0.25/0.30) + (0.15−0.20)·ln(0.15/0.20)
+        = (0.05)·ln(1.25)  + (0.05)·ln(1.167)
+        + (−0.05)·ln(0.833) + (−0.05)·ln(0.75)
+        ≈ (0.05)(0.223) + (0.05)(0.154) + (0.05)(0.182) + (0.05)(0.288)
+        ≈  0.011 + 0.008 + 0.009 + 0.014
+        ≈  0.042  → PSI < 0.1: No significant drift ✓
+
+  Drifted example (PSI > 0.25):
+    Training:   [0.20, 0.30, 0.30, 0.20]
+    Production: [0.05, 0.55, 0.10, 0.30]  ← large population shift
+    PSI ≈ 0.31  → PSI > 0.25: Severe drift — RETRAIN!
 
   KS Test (Kolmogorov-Smirnov):
     Statistical test for distribution difference

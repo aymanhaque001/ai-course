@@ -76,16 +76,16 @@ Module 12 (Classical ML) → Module 15 (MLOps) → Module 16 (Systems Design)
 
 ### Foundations & Prerequisites
 
-| #   | Module                                                                           | Topics                                                                              | Est. Time |
-| --- | -------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- | --------- |
+| #   | Module                                                                                | Topics                                                                              | Est. Time |
+| --- | ------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- | --------- |
 | 11  | [Mathematical Foundations](docs/module-11-math-foundations/README.md)                 | Linear algebra, calculus, probability, information theory, optimization             | 8-10 hrs  |
 | 12  | [Classical Machine Learning](docs/module-12-classical-ml/README.md)                   | Regression, classification, SVMs, trees, ensembles, clustering, feature engineering | 10-12 hrs |
 | 13  | [Deep Learning (CNNs, RNNs, Pre-Transformer)](docs/module-13-deep-learning/README.md) | CNNs, RNNs, LSTMs, seq2seq, attention, BERT, autoencoders, GANs                     | 10-12 hrs |
 
 ### Core LLM Stack
 
-| #   | Module                                                                   | Topics                                                                     | Est. Time |
-| --- | ------------------------------------------------------------------------ | -------------------------------------------------------------------------- | --------- |
+| #   | Module                                                                        | Topics                                                                     | Est. Time |
+| --- | ----------------------------------------------------------------------------- | -------------------------------------------------------------------------- | --------- |
 | 1   | [Neural Network Foundations](docs/module-01-foundations/README.md)            | Neurons, activations, backprop, optimization, regularization, weight init  | 8-10 hrs  |
 | 2   | [Transformer Architecture](docs/module-02-transformers/README.md)             | Self-attention, multi-head, positional encoding, KV-cache, Flash Attention | 8-10 hrs  |
 | 3   | [Tokenization & Embeddings](docs/module-03-tokenization-embeddings/README.md) | BPE, tokenizers, Word2Vec, contextual embeddings, vector spaces            | 6-8 hrs   |
@@ -99,14 +99,14 @@ Module 12 (Classical ML) → Module 15 (MLOps) → Module 16 (Systems Design)
 
 ### Beyond LLMs
 
-| #   | Module                                                         | Topics                                                                  | Est. Time |
-| --- | -------------------------------------------------------------- | ----------------------------------------------------------------------- | --------- |
+| #   | Module                                                              | Topics                                                                  | Est. Time |
+| --- | ------------------------------------------------------------------- | ----------------------------------------------------------------------- | --------- |
 | 14  | [Generative AI Beyond LLMs](docs/module-14-generative-ai/README.md) | Diffusion models, Stable Diffusion, DALL-E, video gen, audio/speech, 3D | 8-10 hrs  |
 
 ### Production & Systems
 
-| #   | Module                                                     | Topics                                                                         | Est. Time |
-| --- | ---------------------------------------------------------- | ------------------------------------------------------------------------------ | --------- |
+| #   | Module                                                          | Topics                                                                         | Est. Time |
+| --- | --------------------------------------------------------------- | ------------------------------------------------------------------------------ | --------- |
 | 15  | [MLOps & Production ML](docs/module-15-mlops/README.md)         | Pipelines, experiment tracking, data management, serving, CI/CD, monitoring    | 10-12 hrs |
 | 16  | [AI Systems Design](docs/module-16-ai-systems-design/README.md) | Design framework, recommendation, search, fraud detection, chatbot, moderation | 12-15 hrs |
 

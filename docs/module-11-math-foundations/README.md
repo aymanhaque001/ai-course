@@ -127,6 +127,36 @@ Geometric intuition:
 - **Spectral clustering:** Eigenvectors of the graph Laplacian
 - **Singular Value Decomposition (SVD):** Foundation of matrix factorization, used in recommendations and LoRA
 
+**Deeper ML Connections — Why Eigenvalues Matter in Practice:**
+
+```
+1. PCA and Variance:
+   Covariance matrix Σ has eigendecomposition Σ = VΛVᵀ
+   - Eigenvectors (V): principal component directions (max variance axes)
+   - Eigenvalues (Λ):  how much variance each PC captures
+   - λ₁ ≥ λ₂ ≥ ... ≥ λₙ  →  first PC captures most variance
+   - Choosing k components: keep enough so Σᵢ₌₁ᵏ λᵢ / Σ λᵢ ≥ 0.95 (95% variance)
+
+2. Gradient Descent Convergence (Hessian eigenvalues):
+   The Hessian H has eigenvalues that determine optimization landscape:
+   - Condition number κ = λ_max / λ_min
+   - Large κ → elongated loss valleys → slow convergence with SGD
+   - This is WHY Adam works: it rescales gradients per-parameter,
+     effectively normalizing the condition number
+   - Gradient descent convergence rate ∝ (κ-1)/(κ+1)
+   - Example: κ = 100 → GD needs ~100× more steps than κ = 1
+
+3. RNN Gradient Flow (Weight matrix eigenvalues):
+   Hidden state: hₜ = tanh(W_h · hₜ₋₁ + W_x · xₜ)
+   - Eigenvalues of W_h determine gradient behavior over time:
+     |λᵢ| > 1 → gradients EXPLODE (exponential growth)
+     |λᵢ| < 1 → gradients VANISH  (exponential decay)
+     |λᵢ| = 1 → stable gradient flow (ideal)
+   - This is exactly why LSTMs/GRUs were invented: gating
+     mechanisms keep effective eigenvalues near 1
+   - Orthogonal initialization sets W_h eigenvalues to |λ| = 1
+```
+
 ### Singular Value Decomposition (SVD)
 
 Any matrix A can be decomposed as:
@@ -296,9 +326,46 @@ Bayes' Theorem:
 │    Used in: Bag-of-words models, topic models                     │
 │                                                                   │
 │  Poisson(λ):       Count of events in fixed interval              │
+│    P(X=k) = λᵏe⁻λ/k!                                             │
 │    Used in: Event modeling, NLP word frequencies                   │
 │                                                                   │
+│  Exponential(λ):   Time between events (continuous)               │
+│    p(x) = λe⁻λˣ for x ≥ 0                                        │
+│    Used in: Inter-arrival times, survival analysis                │
+│                                                                   │
 └──────────────────────────────────────────────────────────────────┘
+```
+
+**Poisson & Exponential in ML Practice:**
+
+```
+Poisson Distribution — Modeling Count Data:
+  "How many events occur in a fixed interval?"
+
+  Examples in ML systems:
+  - API requests per minute → capacity planning, anomaly detection
+  - Word frequencies in documents → topic models, NLP features
+  - Defect counts in manufacturing → quality prediction
+
+  Poisson Regression: predict counts (e.g., number of clicks)
+    log(E[Y|X]) = Xβ  (log link function)
+    More appropriate than linear regression when Y is counts
+    (avoids negative predictions, handles variance ∝ mean)
+
+Exponential Distribution — Modeling Inter-Arrival Times:
+  "How long until the next event?"
+
+  Key property: memoryless — P(X > s+t | X > s) = P(X > t)
+
+  Examples in ML systems:
+  - Time between user sessions → churn prediction
+  - Time between failures → reliability modeling
+  - In diffusion models: the noise schedule can use exponential
+    decay to control the rate of denoising
+
+  Connection: If events follow Poisson(λ),
+  then inter-arrival times follow Exponential(λ).
+  They are dual perspectives on the same process.
 ```
 
 ### Expected Value, Variance, and Covariance
@@ -336,6 +403,40 @@ MLE for language models:
   = minimize -Σᵢ log P(xᵢ | x₁, ..., xᵢ₋₁; θ)   ← this IS cross-entropy loss!
 
   So LLM training IS maximum likelihood estimation.
+```
+
+**Worked Example — MLE for Gaussian Distribution:**
+
+Given data $\{x_1, x_2, \ldots, x_n\}$, assume $x_i \sim \mathcal{N}(\mu, \sigma^2)$:
+
+$$\ell(\mu, \sigma^2) = \log \prod_{i=1}^{n} p(x_i | \mu, \sigma^2) = -\frac{n}{2} \log(2\pi\sigma^2) - \sum_{i=1}^{n} \frac{(x_i - \mu)^2}{2\sigma^2}$$
+
+```
+Step 1: Find μ̂  (take derivative, set to zero)
+
+  ∂ℓ/∂μ = Σᵢ (xᵢ - μ) / σ² = 0
+
+  → μ̂ = (1/n) Σᵢ xᵢ = x̄        (sample mean — intuitive!)
+
+Step 2: Find σ̂²  (take derivative, set to zero)
+
+  ∂ℓ/∂σ² = -n/(2σ²) + Σᵢ (xᵢ - μ)² / (2σ⁴) = 0
+
+  → σ̂² = (1/n) Σᵢ (xᵢ - x̄)²    (sample variance, biased)
+
+  Note: MLE gives biased variance estimate (divides by n, not n-1).
+  Unbiased estimator uses n-1 (Bessel's correction).
+
+Connection to LLM Training:
+  Cross-entropy loss in language models IS the negative log-likelihood
+  under a categorical distribution (one-hot labels):
+
+  MLE: maximize Σᵢ log P_θ(xᵢ | context)
+       = minimize -Σᵢ log P_θ(xᵢ | context)   ← cross-entropy!
+
+  Just as MLE for Gaussians recovers mean and variance,
+  MLE for language models recovers the conditional distribution
+  over the entire vocabulary at each position.
 ```
 
 ### Hypothesis Testing & A/B Testing
@@ -377,6 +478,46 @@ A/B Testing for ML Models:
     - Sample size: need enough data for statistical power
     - Duration: long enough for temporal effects
     - Randomization unit: user-level, session-level, request-level
+```
+
+**Concrete ML Connections — Statistical Testing in Practice:**
+
+```
+1. A/B Testing Model Variants:
+   Compare Model A vs Model B on production traffic.
+   - Use Welch's t-test for continuous metrics (latency, revenue)
+   - Use chi-squared test for proportions (click-through rate)
+   - Always compute effect size (Cohen's d), not just p-values
+   - Practical significance ≠ statistical significance!
+
+2. KS Test for Data Drift Detection:
+   Kolmogorov-Smirnov test compares two distributions.
+   - Run KS test between training data and incoming production data
+   - If p < threshold → feature distribution has shifted → retrain
+   - Two-sample KS test: D = max|F₁(x) - F₂(x)| (max CDF difference)
+   - Monitor per-feature to identify WHICH features drifted
+
+3. Permutation Tests for Feature Importance:
+   Shuffle a feature's values, measure accuracy drop.
+   - No distributional assumptions (nonparametric)
+   - Permute feature k → if accuracy drops significantly, feature k matters
+   - More reliable than impurity-based importance (less biased)
+   - Use n ≥ 1000 permutations for stable p-values
+
+4. Bootstrap Confidence Intervals on Model Metrics:
+   Resample test set with replacement (B = 10,000 times).
+   - Compute metric on each bootstrap sample
+   - 95% CI = [2.5th percentile, 97.5th percentile]
+   - Reports uncertainty: "Accuracy = 0.87 [0.84, 0.90]"
+   - Essential for comparing models: do CIs overlap?
+
+5. Bonferroni Correction for Multiple Comparisons:
+   When testing k hypotheses, adjust significance level: α' = α/k
+   - Evaluating 10 metrics at α=0.05 → use α'=0.005 per test
+   - Without correction: 40% chance of at least one false positive
+     with 10 tests! (1 - 0.95¹⁰ ≈ 0.40)
+   - Alternatives: Holm-Bonferroni (more powerful), Benjamini-Hochberg
+     (controls false discovery rate instead of family-wise error rate)
 ```
 
 ---
@@ -463,6 +604,46 @@ AI Applications:
   │          optimization objective                     │
   └─────────────────────────────────────────────────────┘
 ```
+
+**Asymmetry of KL Divergence — Why Direction Matters:**
+
+$D_{KL}(P \| Q) \neq D_{KL}(Q \| P)$ — the two directions have very different behaviors and are used for different purposes in ML:
+
+```
+Forward KL: D_KL(P ‖ Q)  — "mode-covering" / "inclusive"
+  Penalizes heavily where P(x) > 0 but Q(x) ≈ 0
+  → Q must cover ALL modes of P (even unlikely ones)
+  → Produces broad, diffuse approximations
+  → Equivalent to minimizing cross-entropy H(P, Q)
+
+  Used in: LLM training with cross-entropy loss
+    minimize -Σ P_data(x) log P_θ(x) = minimize D_KL(P_data ‖ P_θ) + const
+    The model learns to cover ALL patterns in the training data.
+
+Reverse KL: D_KL(Q ‖ P)  — "mode-seeking" / "exclusive"
+  Penalizes heavily where Q(x) > 0 but P(x) ≈ 0
+  → Q avoids placing mass where P has none
+  → Produces sharp, concentrated approximations
+  → May ignore some modes of P entirely (mode-dropping)
+
+  Used in: Knowledge distillation (student mimics teacher)
+    Student learns a sharper, less diverse distribution.
+    Good when you want confident, focused outputs.
+
+Visual comparison (fitting Q to a bimodal P):
+
+  True P:         Forward KL Q:       Reverse KL Q:
+     ╱╲    ╱╲       ╱────────╲          ╱╲
+    ╱  ╲  ╱  ╲     ╱  covers  ╲        ╱  ╲   (picks one
+   ╱    ╲╱    ╲   ╱  both modes ╲     ╱    ╲    mode only)
+  ╱            ╲ ╱               ╲   ╱      ╲
+```
+
+**Practical impact in LLMs:**
+
+- Training with cross-entropy (forward KL) encourages the model to be _diverse_ — assign some probability to all plausible continuations
+- Distillation with reverse KL produces _sharper_ student models that commit more confidently to high-probability outputs
+- RLHF uses forward KL as the penalty: $D_{KL}(\pi_\theta \| \pi_{ref})$ keeps the tuned policy from straying too far from the reference
 
 ### Mutual Information
 

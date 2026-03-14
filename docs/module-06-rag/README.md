@@ -118,12 +118,28 @@ Chunk3:                  [════════════════]
 
 Split at natural semantic boundaries (paragraphs, headings, sentences) rather than arbitrary token counts.
 
+**Embedding similarity approach:**
+
+1. Split the document into individual sentences
+2. Embed each sentence using an embedding model
+3. Compute cosine similarity between consecutive sentence embeddings
+4. When similarity drops below a threshold (e.g., < 0.75), insert a chunk boundary — this indicates a topic shift
+5. Group consecutive above-threshold sentences into the same chunk
+
+Alternatively, **LLM-based chunking** uses a language model to identify semantically coherent sections, which is more accurate but significantly more expensive.
+
 ```
 Markdown doc:
   # Introduction          → chunk boundary
   ## Core Concepts        → chunk boundary
   Paragraph 1...          → may split at sentence boundaries based on embedding similarity
   Paragraph 2...
+
+Embedding similarity between consecutive sentences:
+  Sent 1 ←→ Sent 2: 0.92  (same topic, keep together)
+  Sent 2 ←→ Sent 3: 0.88  (same topic, keep together)
+  Sent 3 ←→ Sent 4: 0.61  (topic shift! → split here)
+  Sent 4 ←→ Sent 5: 0.85  (same topic, keep together)
 ```
 
 ### Hierarchical Chunking (Parent-Child)
@@ -188,6 +204,8 @@ Cross-Encoder (slow, for reranking):
   (attends query and doc jointly — more accurate but can't precompute)
 ```
 
+**Why cross-encoders are more accurate:** Bi-encoders independently encode query and document into separate embeddings, so they can only capture similarity at the final embedding level — they cannot model token-level interactions between query and document. For example, a bi-encoder can't easily distinguish "dogs chase cats" from "cats chase dogs" when matching against a query. Cross-encoders concatenate `[CLS] query [SEP] document [SEP]` as a single input, allowing every query token to attend to every document token through full self-attention. This captures nuances like negation ("not recommended" vs "recommended"), qualifier matching ("only in cases where..."), and fine-grained semantic alignment that embedding-level comparison misses.
+
 **Production pattern:** Bi-encoder for top-k retrieval (k=50–200), cross-encoder for reranking to top-5.
 
 ---
@@ -223,10 +241,29 @@ Layer 2 (sparse): ●─────────────────●
 Layer 1:          ●────●────────●───●
 Layer 0 (dense):  ●──●──●──●──●──●──●──●
 
+Construction algorithm:
+  For each new element, assign a random maximum layer:
+    l = floor(-ln(uniform(0,1)) × mL)     (mL = 1/ln(M), M = max connections)
+  This exponential decay means most elements only appear on Layer 0,
+  few reach Layer 1, and very few reach Layer 2+.
+
+  Insertion:
+    1. Start at the entry point (top layer)
+    2. Greedily navigate to the nearest neighbor at each layer
+    3. Descend to the next layer
+    4. At each layer ≤ l, add bidirectional edges to the M nearest
+       neighbors found so far
+
+  Upper layers act as a "coarse highway" — sparse long-range links
+  enable fast traversal across the graph. Lower layers are dense
+  with short-range links for final precision.
+
 Query: start at top layer, greedily navigate to nearest neighbor,
        descend to next layer, repeat until Layer 0.
 
-Result: O(log n) approximate search instead of O(n) exact search.
+Result: O(log N) approximate search instead of O(N) exact search.
+  The logarithmic complexity comes from the hierarchical structure:
+  each layer halves the effective search space (analogous to skip lists).
 Tradeoff: ~98-99% recall at 10-50× speedup over brute force.
 ```
 
@@ -262,8 +299,25 @@ Step 1: LLM generates a hypothetical answer:
 Step 2: Embed the hypothetical answer (not the original query)
 Step 3: Search the vector DB with this embedding
 
-Benefit: The embedding is in the same distribution as stored documents,
-         improving retrieval precision.
+Why this works — the distribution gap problem:
+  Queries are short and interrogative:   "What are the side effects of metformin?"
+  Documents are long and declarative:    "Metformin commonly causes GI side effects..."
+
+  These occupy DIFFERENT regions in embedding space. A query embedding
+  and a relevant document embedding may have moderate cosine similarity
+  even when the document perfectly answers the question.
+
+  By generating a hypothetical answer, we produce text that is:
+    - Declarative (like stored documents)
+    - Long-form (like stored documents)
+    - In the same linguistic register as stored documents
+
+  The hallucinated content doesn't matter because:
+    1. It's only used for retrieval (vector similarity search),
+       NOT as the final answer to the user
+    2. Even an imperfect hypothetical answer lands closer to the
+       correct document cluster than the original query would
+    3. The LLM still generates the final answer from real retrieved docs
 ```
 
 ### Hybrid Search: Dense + Sparse
@@ -396,7 +450,21 @@ Graph RAG Pipeline:
   │     "OpenAI released GPT-4" → (OpenAI, released, GPT-4)  │
   │     Store in knowledge graph (Neo4j, NetworkX)           │
   │     Also: community detection (Leiden algorithm)          │
+  │                                                           │
+  │     Leiden is a community detection algorithm (an improved │
+  │     version of Louvain) that partitions the knowledge      │
+  │     graph into clusters of densely connected entities.     │
+  │     It optimizes modularity: nodes within a community have │
+  │     many edges between them, few edges to other communities│
+  │                                                           │
   │     → cluster related entities into communities           │
+  │     → generate a text summary for each community via LLM  │
+  │                                                           │
+  │     When a query is too broad for individual chunks        │
+  │     (e.g., "What are the main themes in AI safety?"),      │
+  │     Graph RAG retrieves community summaries instead of     │
+  │     individual chunks, enabling global reasoning over      │
+  │     the entire corpus without stuffing all docs in context │
   │     → summarize each community                            │
   │                                                           │
   │  2. RETRIEVAL                                             │

@@ -221,6 +221,22 @@ STEP 4: RANKING MODEL
 
   Weights tuned to optimize for "meaningful engagement"
 
+  HOW multi-task loss is balanced:
+    Naive L = Σ w_i·L_i with fixed weights is brittle — tasks at
+    different scales dominate training (e.g., time_spent in seconds
+    dwarfs binary click loss). Solutions:
+    (1) Uncertainty-weighted loss (Kendall et al.):
+          L = Σ (1/(2σ_i²))·L_i + log(σ_i)
+          Learns per-task uncertainty σ_i from data; high-variance tasks
+          automatically get downweighted. No manual tuning needed.
+    (2) GradNorm: normalize gradient magnitudes across tasks at each
+          step so no single task dominates the shared layers.
+    (3) Manual tuning with task-specific validation metrics:
+          set weights to reflect business priorities (purchase >> click)
+          then sweep values on a held-out validation set.
+    Weights also encode business logic: a like is worth more than a click,
+    a share more than a like, and a report subtracts heavily.
+
 STEP 5: RE-RANKING & POLICIES
 
   After ML ranking, apply business rules:
@@ -254,6 +270,27 @@ STEP 7: COLD START
   New item: Use content features (text embedding,
             image embedding), creator history,
             small initial exposure for data collection
+
+  Multi-armed bandit algorithms for cold start:
+
+  Thompson Sampling (Bayesian exploration):
+    Maintain a Beta(α_i, β_i) distribution for each item's click
+    probability, where α = prior successes + observed clicks,
+    β = prior failures + observed non-clicks.
+    At each request: sample θ_i ~ Beta(α_i, β_i) for each candidate,
+    recommend the item with highest sample θ_i.
+    Items with few observations have wide Beta distributions → high
+    variance samples → natural exploration without a separate ε.
+    As clicks accumulate, distributions sharpen → exploitation.
+
+  UCB (Upper Confidence Bound):
+    Select item i* = argmax_i [ μ̂_i + c · √(log t / n_i) ]
+    where μ̂_i = empirical mean reward, t = total rounds, n_i = times
+    item i was shown, and c controls exploration-exploitation trade-off.
+    Items shown rarely (small n_i) get a large exploration bonus;
+    well-explored items are selected on mean reward alone.
+    Both Thompson Sampling and UCB converge to the optimal item while
+    collecting enough data to resolve cold-start uncertainty.
 
 STEP 8: EVALUATION
 
@@ -359,6 +396,18 @@ STEP 4: RANKING MODEL
   │  ListMLE)    │ Optimizes NDCG directly                       │
   └──────────────┴──────────────────────────────────────────────┘
 
+  HOW LambdaMART optimizes NDCG (lambda gradients):
+    Standard gradient boosting needs a differentiable loss, but NDCG
+    is not differentiable. LambdaMART solves this with "lambda gradients":
+    For each pair of documents (i, j) where i is ranked above j:
+      λ_ij = -∂C/∂s_ij · |ΔNDCG_ij|
+    where |ΔNDCG_ij| is how much NDCG would change by swapping i and j.
+    These λ_ij values replace the true loss gradient in gradient boosting.
+    Result: position-aware optimization — swapping rank 1 vs rank 2
+    (large |ΔNDCG|) drives bigger gradient updates than swapping rank
+    50 vs 51. This is why LambdaMART outperforms pointwise approaches:
+    it directly encodes that top-rank mistakes matter far more.
+
   Production: LambdaMART (XGBoost) for stage 1
               Cross-encoder (BERT-based) for stage 2
 
@@ -373,6 +422,18 @@ STEP 5: TRAINING DATA
   Position bias correction:
     Users more likely to click top results regardless of relevance
     Fix: inverse propensity weighting, randomization experiments
+
+    HOW inverse propensity weighting (IPW) works:
+      Corrected loss = Σ (click_i / P(click | pos_i)) · relevance_signal_i
+      Each click is weighted by 1/P(click|position): clicks on lower-ranked
+      items (where propensity to click is low) get higher weight because
+      users who clicked despite low position signal strong relevance.
+      Propensity estimation: run randomization experiments — randomly
+      shuffle result rankings for a small traffic slice, observe natural
+      click rates at each position. This gives an unbiased estimate of
+      P(click|pos) independent of item relevance. Clicks at position 5
+      (propensity ~0.1) get 10× the weight of clicks at position 1
+      (propensity ~1.0).
 
   Explicit labels (expensive but high quality):
     Human raters label query-product pairs (1-5 scale)
@@ -504,6 +565,19 @@ STEP 5: EXPLAINABILITY (regulatory requirement)
     merchant_risk_score      +0.05
     base_value               0.001  (population fraud rate)
     prediction               0.961  (probability of fraud)
+
+  HOW Shapley values are computed:
+    SHAP comes from cooperative game theory. Each feature's contribution:
+      φ_i = Σ_{S ⊆ N\{i}} |S|!(|N|-|S|-1)!/|N|! · [f(S∪{i}) - f(S)]
+    This averages the marginal contribution of feature i over all possible
+    subsets S of the other features — a weighted average over all insertion
+    orders. Naively exponential (2^|N| subsets), but:
+    - TreeSHAP: exploits tree structure (decision paths) for exact
+      polynomial-time computation on XGBoost/LightGBM/RF models.
+    - KernelSHAP: for neural nets, approximates Shapley values using
+      weighted linear regression on sampled feature coalitions.
+    Key property (efficiency): φ_base + Σφ_i = f(x), so contributions
+    sum exactly to the prediction — unlike simple feature importances.
 
 STEP 6: HANDLING CONCEPT DRIFT
 

@@ -8,6 +8,7 @@
 ## 2.1 The Big Picture
 
 The Transformer (Vaswani et al., 2017) replaced recurrence with **self-attention**, enabling:
+
 - **Parallelized training** across sequence positions
 - **Direct connections** between any two tokens (no information bottleneck)
 - **Scalability** to billions of parameters
@@ -43,6 +44,7 @@ The Transformer (Vaswani et al., 2017) replaced recurrence with **self-attention
 Self-attention lets each token "look at" every other token in the sequence and compute a weighted sum based on relevance.
 
 Example: "The **cat** sat on the **mat** because **it** was soft."
+
 - For the token "it", attention should focus heavily on "mat" (what "it" refers to).
 
 ### Queries, Keys, and Values
@@ -103,15 +105,19 @@ where headᵢ = Attention(QWᵢQ, KWᵢK, VWᵢV)
 ```
 
 **Dimensions:**
+
 - Model dimension: d_model (e.g., 4096 for LLaMA-7B)
 - Number of heads: h (e.g., 32)
 - Per-head dimension: d_k = d_model / h (e.g., 128)
 
-**Why multiple heads?** Different heads learn to attend to different types of relationships:
-- Head 1 might learn syntactic dependencies (subject-verb)
-- Head 2 might learn coreference (pronoun-antecedent)
-- Head 3 might learn positional proximity
-- This is analogous to multiple convolutional filters learning different visual features
+**Why multiple heads?** Each attention head has its own Q, K, V projection matrices, so each head computes attention in a _different learned subspace_. Empirically, different heads specialize in different linguistic relationships:
+
+- Head 1 might learn syntactic dependencies (subject-verb agreement)
+- Head 2 might learn coreference (which noun a pronoun refers to)
+- Head 3 might learn positional proximity (attend to adjacent tokens)
+- Head 4 might learn semantic similarity (attend to topically related words)
+
+With a **single head**, all these patterns would compete for the same attention weights — the model would have to make a hard choice about which relationship to capture. With multiple heads, these patterns are captured **simultaneously and independently**, then combined via the output projection Wₒ. This is analogous to multiple convolutional filters learning different visual features (edges, textures, shapes) in CNNs.
 
 ---
 
@@ -134,6 +140,7 @@ Q   q₃  [  ✓    ✓    ✓    ✗    ✗  ]     ← token 3 sees tokens 1-3
 ```
 
 **Implementation:** Before softmax, add a mask matrix where masked positions = -∞:
+
 ```python
 scores = (Q @ K.T) / math.sqrt(d_k)
 mask = torch.triu(torch.ones(seq_len, seq_len), diagonal=1).bool()
@@ -186,18 +193,23 @@ output = weights @ V
 The FFN in each block is a position-wise MLP applied independently to each token:
 
 **Standard:**
+
 ```
 FFN(x) = GELU(xW₁ + b₁)W₂ + b₂
 ```
 
 **SwiGLU (used in LLaMA, PaLM, modern LLMs):**
+
 ```
 SwiGLU(x) = (Swish(xW₁) ⊙ xW₃) W₂
 ```
+
 - ⊙ = element-wise multiplication
-- Uses a gating mechanism: one projection produces gates, another produces values
-- Empirically outperforms standard FFN at the same parameter count
 - Hidden dimension is typically ~2.67× the model dimension (for SwiGLU) vs 4× (for standard FFN)
+
+**Why gating improves over standard FFN:** In a standard FFN, the transformation GELU(xW₁)W₂ applies the same non-linearity uniformly. SwiGLU introduces a **learned, input-dependent gate**: xW₁ produces a gate signal (passed through Swish to create values between 0 and 1), and xW₃ produces candidate values. The element-wise product means the gate _selectively suppresses or amplifies_ different features in the candidate. This is more expressive because the network can learn to route information: "for this input, activate these features and suppress those."
+
+The cost is an extra weight matrix (3 matrices instead of 2), which is why the hidden dimension is reduced to ~2.67× to keep the parameter count equivalent. Despite this, SwiGLU consistently achieves measurably better loss than standard FFN at the same total parameter budget — Shazeer (2020) showed ~1-3% improvement across multiple model sizes.
 
 ---
 
@@ -206,6 +218,7 @@ SwiGLU(x) = (Swish(xW₁) ⊙ xW₃) W₂
 Self-attention is permutation-invariant — without positional information, "dog bites man" = "man bites dog". We need to inject position information.
 
 ### Sinusoidal (Original Transformer)
+
 ```
 PE(pos, 2i)   = sin(pos / 10000^(2i/d_model))
 PE(pos, 2i+1) = cos(pos / 10000^(2i/d_model))
@@ -242,12 +255,17 @@ where m = position index, θᵢ = 10000^(-2i/d)
 **Why RoPE won:** (1) Naturally captures relative positions; (2) Can be extended to longer sequences than seen during training; (3) No extra parameters; (4) Used by LLaMA, Mistral, and most modern open-source LLMs.
 
 ### ALiBi (Attention with Linear Biases)
-Instead of modifying embeddings, ALiBi adds a linear bias to attention scores:
+
+Instead of modifying embeddings, ALiBi adds a linear bias directly to attention scores:
+
 ```
 Attention score for (query at pos i, key at pos j):
 score = qᵢᵀkⱼ - m·|i - j|
 ```
-where m is a head-specific slope. Closer tokens get higher scores. Used in BLOOM and some other models.
+
+where m is a **head-specific slope** set as a geometric sequence: for h heads, the slopes are 2^(-8/h), 2^(-16/h), ..., 2^(-8). For 8 heads, m ∈ {1/2, 1/4, 1/8, ..., 1/256}. Different slopes mean different heads have different "attention windows" — heads with small m attend broadly, heads with large m focus locally.
+
+**Why ALiBi enables length extrapolation:** Learned positional embeddings and sinusoidal encodings only work for positions seen during training. If you train with max length 2048, position 2049 has no embedding. RoPE can be extended but requires frequency adjustments. ALiBi's linear bias is a simple function — m·|i-j| — that naturally extends to any distance. At position 10000, the penalty is just 10000·m, which the softmax handles naturally. This makes ALiBi the simplest approach for length generalization, though RoPE with scaling tends to produce better quality for moderate extensions.
 
 ---
 
@@ -256,6 +274,7 @@ where m is a head-specific slope. Closer tokens get higher scores. Used in BLOOM
 During autoregressive generation, we generate one token at a time. Naively, each new token requires recomputing attention over all previous tokens.
 
 **Without KV-Cache (naive):**
+
 ```
 Step 1: Compute attention for [The]                    → output token: "cat"
 Step 2: Compute attention for [The, cat]               → output token: "sat"
@@ -266,6 +285,7 @@ Each step recomputes K and V for ALL previous tokens. O(T²) total.
 ```
 
 **With KV-Cache:**
+
 ```
 Step 1: Compute K₁,V₁ for [The], store in cache        → "cat"
 Step 2: Compute K₂,V₂ for [cat], append to cache       → "sat"
@@ -276,14 +296,26 @@ Step 3: Compute K₃,V₃ for [sat], append to cache       → "on"
 Only compute Q for the NEW token, reuse cached K,V. O(T) per step.
 ```
 
-**Memory cost:** For each layer, we store K and V tensors of shape (batch, heads, seq_len, d_head). For a 70B model with 32K context:
+**Memory cost formula:** For each layer, we store K and V tensors of shape (batch, kv_heads, seq_len, d_head):
+
 ```
-KV-cache ≈ 2 × num_layers × 2 × num_heads × seq_len × d_head × bytes_per_param
-         ≈ 2 × 80 × 2 × 64 × 32768 × 128 × 2 bytes (FP16)
-         ≈ ~160 GB for a single 32K sequence!
+KV-cache = 2 × n_layers × n_kv_heads × seq_len × d_head × bytes_per_param
 ```
 
-This is why KV-cache optimization (GQA, MQA, quantization) is critical for serving.
+The factor of 2 is for K and V. Let's compute this for a 70B model (80 layers, 64 KV heads, d_head=128) with 32K context in FP16 (2 bytes):
+
+```
+= 2 × 80 × 64 × 32768 × 128 × 2 bytes
+= ~86 GB per sequence!
+```
+
+For a batch of 8 concurrent users, that’s **~688 GB** of KV-cache alone — far exceeding GPU memory. This is why the KV-cache, not model weights, becomes the serving bottleneck for long-context models. The KV-cache determines:
+
+- **Maximum context length:** Limited by available GPU memory after model weights
+- **Maximum batch size:** Each concurrent request adds its own KV-cache
+- **Throughput:** GPU memory spent on KV-cache can't be used for batching more requests
+
+This is why KV-cache optimization (GQA, MQA, quantization, PagedAttention) is critical for serving.
 
 ---
 
@@ -360,13 +392,13 @@ Temperature controls randomness:
   T > 1.0: flatter distribution (more random)
 ```
 
-| Strategy | Description | When to Use |
-|----------|------------|-------------|
-| **Greedy** | Always pick highest-probability token | Code generation, factual QA |
-| **Top-k** | Sample from top k highest-probability tokens | Creative text (k=40-100) |
+| Strategy            | Description                                                         | When to Use                  |
+| ------------------- | ------------------------------------------------------------------- | ---------------------------- |
+| **Greedy**          | Always pick highest-probability token                               | Code generation, factual QA  |
+| **Top-k**           | Sample from top k highest-probability tokens                        | Creative text (k=40-100)     |
 | **Top-p (nucleus)** | Sample from smallest set of tokens whose cumulative probability ≥ p | General-purpose (p=0.9-0.95) |
-| **Temperature** | Scale logits by 1/T before softmax | Combine with top-k/top-p |
-| **Beam search** | Maintain b best partial sequences | Translation, summarization |
+| **Temperature**     | Scale logits by 1/T before softmax                                  | Combine with top-k/top-p     |
+| **Beam search**     | Maintain b best partial sequences                                   | Translation, summarization   |
 
 ```
 Vocabulary: [the, a, cat, dog, sat, ran, on, ...]
@@ -382,15 +414,16 @@ High temp (T=2):  the=0.22, cat=0.18, a=0.16, sat=0.14, ... → flatter, more ra
 
 ## 2.11 Model Dimensions — Concrete Numbers
 
-| Model | d_model | Heads | Layers | FFN dim | Vocab | Params |
-|-------|---------|-------|--------|---------|-------|--------|
-| GPT-2 Small | 768 | 12 | 12 | 3072 | 50257 | 117M |
-| GPT-2 XL | 1600 | 25 | 48 | 6400 | 50257 | 1.5B |
-| LLaMA 7B | 4096 | 32 | 32 | 11008 | 32000 | 6.7B |
-| LLaMA 70B | 8192 | 64 | 80 | 28672 | 32000 | 65B |
-| GPT-3 175B | 12288 | 96 | 96 | 49152 | 50257 | 175B |
+| Model       | d_model | Heads | Layers | FFN dim | Vocab | Params |
+| ----------- | ------- | ----- | ------ | ------- | ----- | ------ |
+| GPT-2 Small | 768     | 12    | 12     | 3072    | 50257 | 117M   |
+| GPT-2 XL    | 1600    | 25    | 48     | 6400    | 50257 | 1.5B   |
+| LLaMA 7B    | 4096    | 32    | 32     | 11008   | 32000 | 6.7B   |
+| LLaMA 70B   | 8192    | 64    | 80     | 28672   | 32000 | 65B    |
+| GPT-3 175B  | 12288   | 96    | 96     | 49152   | 50257 | 175B   |
 
 **Parameter count formula (decoder-only):**
+
 ```
 Attention:  4 × d_model² per layer  (W_Q, W_K, W_V, W_O)
 FFN:        ~2.67 × 4 × d_model² per layer (SwiGLU has 3 matrices)
@@ -422,9 +455,26 @@ Memory: O(N²)                         Memory: O(N)
 IO-bound on GPU                       Compute-bound (faster!)
 ```
 
-**Key idea:** Restructure attention computation to work in blocks that fit in GPU SRAM (fast, small memory) instead of GPU HBM (slow, large memory). Uses online softmax trick to compute exact attention without storing the full matrix.
+**Key idea — the memory hierarchy insight:**
 
-**Impact:** 2-4× faster training, enables much longer context windows, used everywhere now (PyTorch 2.0+, all major LLM frameworks).
+Modern GPUs have two levels of memory:
+
+- **SRAM** (on-chip, ~20MB): Very fast (~19 TB/s bandwidth), but tiny.
+- **HBM** (main GPU RAM, ~80GB on A100): Large, but slow (~2 TB/s bandwidth).
+
+Standard attention computes the full N×N matrix and writes it to HBM, then reads it back for the softmax and V multiplication. The bottleneck is not compute — it's _reading and writing_ this huge matrix to slow HBM memory.
+
+Flash Attention restructures the computation into **tiles** that fit entirely in SRAM:
+
+1. Divide Q into blocks of rows, K and V into blocks of columns
+2. For each block pair, compute that tile of attention scores in SRAM
+3. Use the **online softmax trick** (Milakov & Gimelshein, 2018): maintain running max and sum statistics so the softmax can be computed incrementally without needing the full row of scores
+4. Accumulate the weighted V contributions directly in SRAM
+5. Write only the final output to HBM — never the N×N attention matrix
+
+Because the N×N matrix is never materialized in HBM, memory drops from O(N²) to O(N). And because the algorithm is now compute-bound (doing useful FLOPs) rather than memory-bound (waiting for HBM reads/writes), it runs 2-4× faster despite doing the same amount of arithmetic.
+
+**Impact:** Flash Attention is now the default in PyTorch 2.0+ (via `torch.nn.functional.scaled_dot_product_attention`), all major LLM frameworks, and has enabled context windows of 100K+ tokens that would be impossible with standard attention.
 
 ---
 
@@ -504,6 +554,7 @@ IO-bound on GPU                       Compute-bound (faster!)
    def causal_mask(seq_len):
        return torch.triu(torch.ones(seq_len, seq_len, dtype=torch.bool), diagonal=1)
    ```
+
    </details>
 
 8. **Implement a complete multi-head attention module with causal masking.**
@@ -552,6 +603,7 @@ IO-bound on GPU                       Compute-bound (faster!)
            attn_output = attn_output.transpose(1, 2).contiguous().view(batch, seq_len, self.d_model)
            return self.W_o(attn_output)
    ```
+
    </details>
 
 9. **Given a pre-trained transformer, implement KV-cache for efficient autoregressive generation.**
@@ -598,6 +650,7 @@ IO-bound on GPU                       Compute-bound (faster!)
 
        return generated
    ```
+
    </details>
 
 ### System Design
@@ -611,6 +664,7 @@ IO-bound on GPU                       Compute-bound (faster!)
 ---
 
 ## Key Papers
+
 - Vaswani et al. (2017) — "Attention Is All You Need" (the original Transformer)
 - Radford et al. (2018, 2019) — GPT, GPT-2 (decoder-only transformers for language modeling)
 - Su et al. (2021) — "RoFormer: Enhanced Transformer with Rotary Position Embedding" (RoPE)

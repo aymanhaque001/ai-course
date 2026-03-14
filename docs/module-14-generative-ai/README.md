@@ -91,6 +91,33 @@ Training Loss (simplified):
   "Predict the noise that was added" — that's the entire training!
 ```
 
+### DDPM Training Loss and the ELBO
+
+```
+Why does predicting noise work? Connection to variational inference:
+
+  The full ELBO (Evidence Lower Bound) on log p(x₀) decomposes as:
+
+    ELBO = E[log p_θ(x₀|x₁)]              ← reconstruction term
+         - D_KL[q(x_T|x₀) || p(x_T)]     ← prior matching term
+         - Σ_t D_KL[q(xₜ₋₁|xₜ,x₀) || p_θ(xₜ₋₁|xₜ)]  ← denoising terms
+
+  Each D_KL denoising term at timestep t reduces to a noise-prediction MSE:
+
+    L_t ∝ E[‖ε - εθ(xₜ, t)‖²]
+
+  Ho et al. (DDPM) showed that the SIMPLIFIED loss — equal weighting
+  across all timesteps instead of the VLB's per-timestep weighting —
+  works BETTER in practice despite being a looser bound.
+
+  Key insight:
+    Simplified loss ← a reweighted (looser) version of the ELBO
+    This connects diffusion models to the VAE framework:
+      VAE encoder  ↔  forward process q(xₜ|x₀)  (fixed, not learned)
+      VAE decoder  ↔  reverse process p_θ(xₜ₋₁|xₜ)  (learned denoiser)
+      ELBO         ↔  variational lower bound on log p(x₀)
+```
+
 ### The U-Net Architecture for Diffusion
 
 ```
@@ -239,6 +266,21 @@ DiT Architecture:
          ▼
   Predicted noise
 
+AdaLN Mechanism (Adaptive Layer Norm):
+  Standard LayerNorm:  y = γ · x̂ + β   (γ, β are fixed learned parameters)
+  AdaLN:               y = γ(c) · x̂ + β(c)
+                       γ(c) and β(c) are OUTPUT of a small MLP given c
+
+  Conditioning signal c = timestep embedding + text embedding (summed/concat)
+  The MLP predicts scale and shift for EACH transformer block independently.
+
+  Why AdaLN beats additive conditioning:
+    Additive:   h = h + f(c)        — shifts features, same scale
+    AdaLN:      h = γ(c)·norm(h) + β(c)  — controls both magnitude AND bias
+    → More expressive: conditioning can suppress or amplify entire feature dims
+    → More efficient: avoids cross-attention overhead at every layer
+    → Empirically stronger signal integration than simple addition
+
 Used in: DALL-E 3, Stable Diffusion 3, Flux, Sora
 ```
 
@@ -292,7 +334,37 @@ CLIP Training (Contrastive Language-Image Pre-training):
 │ ControlNet   │ Additional conditioning with spatial controls:    │
 │              │ edge maps, depth maps, pose, segmentation        │
 │              │ Preserves composition while changing style        │
-├──────────────┼──────────────────────────────────────────────────┤
+└──────────────┴──────────────────────────────────────────────────┘
+
+### ControlNet Architecture — Zero Convolutions
+
+```
+How ControlNet injects spatial control without breaking the base model:
+
+  Original U-Net encoder (FROZEN — weights never change)
+       │                         ┌── skip connections ──┐
+       │  exact copy             │                      │
+       ▼  (trainable)            │                      ▼
+  ControlNet encoder copy  ──zero conv──▶  U-Net decoder
+       │
+       ▲
+  Control signal (edge map, depth map, pose skeleton, ...)
+
+  "Zero convolutions" = 1×1 convolutions initialized with weights=0, bias=0
+
+  Why zero initialization matters:
+    At training step 0: zero conv outputs 0 → adds nothing to the U-Net
+    → ControlNet starts with ZERO effect on the frozen model
+    → No risk of corrupting the pre-trained weights on first steps
+    → Gradually learns to inject spatial guidance as weights grow from zero
+
+  Training: freeze original U-Net, train only the copy + zero convs
+  Add control signal outputs to the original U-Net's skip connections
+  Result: spatial structure (pose, edges) preserved while text controls style
+```
+
+```
+┌──────────────┬──────────────────────────────────────────────────┐
 │ IP-Adapter   │ Image prompt adapter — use a reference image     │
 │              │ as a style/content guide                          │
 ├──────────────┼──────────────────────────────────────────────────┤
@@ -400,8 +472,31 @@ Modern TTS Pipeline:
   VALL-E Architecture:
     1. Audio → Neural audio codec → Discrete tokens
        (like tokenizing text, but for audio)
+
+    The codec uses Residual Vector Quantization (RVQ):
+
+      ┌─────────────────────────────────────────────────────────────┐
+      │  Audio waveform → CNN encoder → continuous features         │
+      │                                                              │
+      │  Layer 1 VQ:   quantize features        → codebook tokens C₁│
+      │                residual₁ = features - C₁  (what's left over) │
+      │  Layer 2 VQ:   quantize residual₁       → codebook tokens C₂│
+      │                residual₂ = residual₁ - C₂                   │
+      │  Layer 3 VQ:   quantize residual₂       → codebook tokens C₃│
+      │  ...                (repeat for all 8 layers)               │
+      │                                                              │
+      │  Result: audio → 8 parallel token streams at ~75 Hz         │
+      │    C₁ = coarse structure (speaker, prosody, rough phonemes)  │
+      │    C₂–C₈ = progressively finer acoustic detail              │
+      └─────────────────────────────────────────────────────────────┘
+
+      EnCodec / SoundStream both use this RVQ scheme.
+      More codebook layers = higher audio quality but more tokens.
+
     2. Text + 3-second voice sample → predict audio tokens
        (autoregressive, like a language model!)
+       VALL-E generates C₁ autoregressively (captures semantics),
+       then generates C₂–C₈ NON-autoregressively in parallel (fast)
     3. Audio tokens → codec decoder → waveform
 
     This is fundamentally an LLM-style approach applied to audio.
@@ -445,7 +540,27 @@ Key insight:
   NeRF (Neural Radiance Fields):
     Input: multiple photos of a scene
     Output: 3D representation (render from any angle)
-    Learn: f(x, y, z, θ, φ) → (color, density)
+    Learn: F(x, y, z, θ, φ) → (r, g, b, σ)
+           3D position + viewing direction → color + volume density
+
+    Volume Rendering Equation:
+      Cast a ray r(t) = o + td per pixel through the scene
+      Sample N points along the ray: t₁, t₂, ..., t_N
+
+      Accumulated color:  C = Σᵢ Tᵢ · (1 - exp(-σᵢ·δᵢ)) · cᵢ
+
+        where:
+          δᵢ        = distance between adjacent samples (step size)
+          σᵢ        = density at sample i (how opaque is this point?)
+          cᵢ        = color at sample i
+          Tᵢ        = exp(-Σⱼ<ᵢ σⱼ·δⱼ) = transmittance (how much light
+                      reaches point i without being blocked)
+          (1-exp(-σᵢδᵢ)) = probability this sample emits visible light
+
+      Positional encoding: γ(p) = (sin(2⁰πp), cos(2⁰πp), ..., sin(2^Lπp), cos(2^Lπp))
+        Maps raw coordinates through sinusoids at multiple frequencies
+        Critical for capturing high-frequency detail (sharp edges, fine texture)
+        Without it, networks converge to blurry low-frequency functions
 
   3D Gaussian Splatting (2023):
     Faster than NeRF (real-time rendering!)
