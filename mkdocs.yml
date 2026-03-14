@@ -1,8 +1,8 @@
 site_name: "Complete AI & Machine Learning Course"
 site_description: "From mathematical foundations to production AI systems — a comprehensive, self-paced curriculum"
-site_url: ""
-repo_url: ""
-repo_name: ""
+site_url: "https://aymanhaque001.github.io/ai-course/"
+repo_url: "https://github.com/aymanhaque001/ai-course"
+repo_name: "aymanhaque001/ai-course"
 
 docs_dir: docs
 
