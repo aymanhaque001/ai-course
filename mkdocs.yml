@@ -102,6 +102,8 @@ nav:
   - Production:
       - '15 — MLOps & Production ML': module-15-mlops/README.md
       - '16 — AI Systems Design': module-16-ai-systems-design/README.md
+  - Interview Prep:
+      - '17 — LeetCode for AI Engineers': module-17-leetcode-interview-prep/README.md
 
 exclude_docs: |
   mkdocs.yml
