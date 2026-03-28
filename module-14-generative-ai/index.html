@@ -1,0 +1,2681 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="From mathematical foundations to production AI systems — a comprehensive, self-paced curriculum">
+      
+      
+      
+        <link rel="canonical" href="https://aymanhaque001.github.io/ai-course/module-14-generative-ai/">
+      
+      
+        <link rel="prev" href="../module-10-advanced/">
+      
+      
+        <link rel="next" href="../module-15-mlops/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>14 — Generative AI - Complete AI & Machine Learning Course</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Inter";--md-code-font:"JetBrains Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="https://unpkg.com/katex@0.16.10/dist/katex.min.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="deep-purple" data-md-color-accent="amber">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#module-14-generative-ai-beyond-llms-diffusion-vision-audio" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="Complete AI &amp; Machine Learning Course" class="md-header__button md-logo" aria-label="Complete AI & Machine Learning Course" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Complete AI & Machine Learning Course
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              14 — Generative AI
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="deep-purple" data-md-color-accent="amber"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="deep-purple" data-md-color-accent="amber"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/aymanhaque001/ai-course" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    aymanhaque001/ai-course
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href=".." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../module-11-math-foundations/" class="md-tabs__link">
+          
+  
+  
+  Foundations
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../module-01-foundations/" class="md-tabs__link">
+          
+  
+  
+  Core LLM Stack
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="./" class="md-tabs__link">
+          
+  
+  
+  Beyond LLMs
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../module-15-mlops/" class="md-tabs__link">
+          
+  
+  
+  Production
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../module-17-leetcode-interview-prep/" class="md-tabs__link">
+          
+  
+  
+  Interview Prep
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Complete AI &amp; Machine Learning Course" class="md-nav__button md-logo" aria-label="Complete AI & Machine Learning Course" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Complete AI & Machine Learning Course
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/aymanhaque001/ai-course" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    aymanhaque001/ai-course
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Foundations
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Foundations
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../module-11-math-foundations/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    11 — Math & Statistics
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../module-12-classical-ml/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    12 — Classical Machine Learning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../module-13-deep-learning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    13 — Deep Learning (Pre-Transformer)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Core LLM Stack
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Core LLM Stack
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../module-01-foundations/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    01 — Neural Network Foundations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../module-02-transformers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    02 — Transformer Architecture
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../module-03-tokenization-embeddings/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    03 — Tokenization & Embeddings
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../module-04-training/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    04 — Training LLMs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../module-05-prompt-engineering/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    05 — Prompt Engineering
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../module-06-rag/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    06 — Retrieval-Augmented Generation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../module-07-evaluation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    07 — Evaluation & Benchmarks
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../module-08-scaling/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    08 — Scaling & Inference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../module-09-safety-alignment/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    09 — Safety & Alignment
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../module-10-advanced/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    10 — Advanced Topics
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Beyond LLMs
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Beyond LLMs
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    14 — Generative AI
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    14 — Generative AI
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#141-the-generative-ai-landscape" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        14.1 The Generative AI Landscape
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#142-diffusion-models-the-foundation-of-image-generation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        14.2 Diffusion Models — The Foundation of Image Generation
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="14.2 Diffusion Models — The Foundation of Image Generation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#core-intuition" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Core Intuition
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mathematical-framework-ddpm" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Mathematical Framework (DDPM)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ddpm-training-loss-and-the-elbo" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DDPM Training Loss and the ELBO
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#the-u-net-architecture-for-diffusion" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The U-Net Architecture for Diffusion
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#from-ddpm-to-modern-diffusion" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        From DDPM to Modern Diffusion
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#143-text-to-image-systems" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        14.3 Text-to-Image Systems
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="14.3 Text-to-Image Systems">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#dall-e-evolution" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DALL-E Evolution
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#stable-diffusion-architecture" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Stable Diffusion Architecture
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#diffusion-transformers-dit-the-future" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Diffusion Transformers (DiT) — The Future
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#clip-connecting-language-and-vision" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CLIP — Connecting Language and Vision
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#144-image-editing-controlled-generation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        14.4 Image Editing &amp; Controlled Generation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1410-interview-questions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        14.10 Interview Questions
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="14.10 Interview Questions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#conceptual-questions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Conceptual Questions
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#coding-questions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Coding Questions
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#system-design-questions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        System Design Questions
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1411-key-papers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        14.11 Key Papers
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Production
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Production
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../module-15-mlops/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    15 — MLOps & Production ML
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../module-16-ai-systems-design/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    16 — AI Systems Design
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Interview Prep
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Interview Prep
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../module-17-leetcode-interview-prep/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    17 — LeetCode for AI Engineers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#141-the-generative-ai-landscape" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        14.1 The Generative AI Landscape
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#142-diffusion-models-the-foundation-of-image-generation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        14.2 Diffusion Models — The Foundation of Image Generation
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="14.2 Diffusion Models — The Foundation of Image Generation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#core-intuition" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Core Intuition
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mathematical-framework-ddpm" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Mathematical Framework (DDPM)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ddpm-training-loss-and-the-elbo" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DDPM Training Loss and the ELBO
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#the-u-net-architecture-for-diffusion" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The U-Net Architecture for Diffusion
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#from-ddpm-to-modern-diffusion" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        From DDPM to Modern Diffusion
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#143-text-to-image-systems" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        14.3 Text-to-Image Systems
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="14.3 Text-to-Image Systems">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#dall-e-evolution" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DALL-E Evolution
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#stable-diffusion-architecture" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Stable Diffusion Architecture
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#diffusion-transformers-dit-the-future" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Diffusion Transformers (DiT) — The Future
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#clip-connecting-language-and-vision" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CLIP — Connecting Language and Vision
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#144-image-editing-controlled-generation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        14.4 Image Editing &amp; Controlled Generation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1410-interview-questions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        14.10 Interview Questions
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="14.10 Interview Questions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#conceptual-questions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Conceptual Questions
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#coding-questions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Coding Questions
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#system-design-questions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        System Design Questions
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1411-key-papers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        14.11 Key Papers
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="module-14-generative-ai-beyond-llms-diffusion-vision-audio">Module 14: Generative AI Beyond LLMs — Diffusion, Vision &amp; Audio<a class="headerlink" href="#module-14-generative-ai-beyond-llms-diffusion-vision-audio" title="Permanent link">&para;</a></h1>
+<blockquote>
+<p><strong>Prerequisites:</strong> Module 1 (Foundations), Module 13 (CNNs, GANs, VAEs)<br />
+<strong>Estimated Time:</strong> 8-10 hours<br />
+<strong>Relevance:</strong> Modern AI systems are multimodal. Understanding image, video, and audio generation is essential for building complete AI applications</p>
+</blockquote>
+<hr />
+<h2 id="141-the-generative-ai-landscape">14.1 The Generative AI Landscape<a class="headerlink" href="#141-the-generative-ai-landscape" title="Permanent link">&para;</a></h2>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>┌──────────────────────────────────────────────────────────────────┐
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>│                    Generative AI Model Types                      │
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>├──────────────────────────────────────────────────────────────────┤
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>│                                                                   │
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>│  TEXT:       LLMs (GPT, Claude, LLaMA)      ← Modules 1-10      │
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>│                                                                   │
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>│  IMAGES:    Diffusion Models (DALL-E 3, Midjourney, SD, Flux)    │
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>│             GANs (StyleGAN — legacy) ← THIS MODULE               │
+</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>│                                                                   │
+</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>│  VIDEO:     Sora (OpenAI), Veo 2 (Google), Runway Gen-3          │
+</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>│             Based on video diffusion transformers                  │
+</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>│                                                                   │
+</span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>│  AUDIO:     Music: Suno, Udio, MusicGen                          │
+</span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>│             Speech: Whisper (STT), TTS models                     │
+</span><span id="__span-0-15"><a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>│             Sound: AudioLDM, Stable Audio                         │
+</span><span id="__span-0-16"><a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a>│                                                                   │
+</span><span id="__span-0-17"><a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a>│  3D:        Point-E, Shap-E, Gaussian Splatting                  │
+</span><span id="__span-0-18"><a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a>│                                                                   │
+</span><span id="__span-0-19"><a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a>│  CODE:      Codex, StarCoder, DeepSeek-Coder (also LLMs)        │
+</span><span id="__span-0-20"><a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a>│                                                                   │
+</span><span id="__span-0-21"><a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a>│  MULTIMODAL: GPT-4o, Gemini, Claude (unified input/output)       │
+</span><span id="__span-0-22"><a id="__codelineno-0-22" name="__codelineno-0-22" href="#__codelineno-0-22"></a>│                                                                   │
+</span><span id="__span-0-23"><a id="__codelineno-0-23" name="__codelineno-0-23" href="#__codelineno-0-23"></a>└──────────────────────────────────────────────────────────────────┘
+</span></code></pre></div>
+<hr />
+<h2 id="142-diffusion-models-the-foundation-of-image-generation">14.2 Diffusion Models — The Foundation of Image Generation<a class="headerlink" href="#142-diffusion-models-the-foundation-of-image-generation" title="Permanent link">&para;</a></h2>
+<h3 id="core-intuition">Core Intuition<a class="headerlink" href="#core-intuition" title="Permanent link">&para;</a></h3>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>Forward Process (add noise gradually):
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>  Clean image → Slightly noisy → More noisy → ... → Pure noise
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>     x₀           x₁              x₂              x_T ~ N(0,I)
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>
+</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>  ┌──────┐   ┌──────┐   ┌──────┐   ┌──────┐   ┌──────┐
+</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>  │ 🐱   │ → │ 🐱+ε │ → │ 🐱+εε│ → │ ░░░░ │ → │ ████ │
+</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>  │ cat  │   │      │   │      │   │      │   │noise │
+</span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>  └──────┘   └──────┘   └──────┘   └──────┘   └──────┘
+</span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a>   t=0        t=1        t=2       t=T-1       t=T
+</span><span id="__span-1-11"><a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a>
+</span><span id="__span-1-12"><a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a>Reverse Process (LEARN to denoise):
+</span><span id="__span-1-13"><a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a>
+</span><span id="__span-1-14"><a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a>  Pure noise → Less noisy → ... → Slightly noisy → Clean image!
+</span><span id="__span-1-15"><a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a>     x_T          x_{T-1}           x₁               x₀
+</span><span id="__span-1-16"><a id="__codelineno-1-16" name="__codelineno-1-16" href="#__codelineno-1-16"></a>
+</span><span id="__span-1-17"><a id="__codelineno-1-17" name="__codelineno-1-17" href="#__codelineno-1-17"></a>  The model learns: given noisy image at step t,
+</span><span id="__span-1-18"><a id="__codelineno-1-18" name="__codelineno-1-18" href="#__codelineno-1-18"></a>  predict the NOISE that was added (ε-prediction)
+</span><span id="__span-1-19"><a id="__codelineno-1-19" name="__codelineno-1-19" href="#__codelineno-1-19"></a>
+</span><span id="__span-1-20"><a id="__codelineno-1-20" name="__codelineno-1-20" href="#__codelineno-1-20"></a>  Then subtract that predicted noise to get a cleaner image.
+</span></code></pre></div>
+<h3 id="mathematical-framework-ddpm">Mathematical Framework (DDPM)<a class="headerlink" href="#mathematical-framework-ddpm" title="Permanent link">&para;</a></h3>
+<div class="arithmatex">\[q(x_t | x_{t-1}) = \mathcal{N}(x_t; \sqrt{1-\beta_t} \, x_{t-1}, \beta_t I)\]</div>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>Forward Process (fixed, not learned):
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>  q(xₜ | xₜ₋₁) = N(xₜ ; √(1-βₜ) xₜ₋₁, βₜI)
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>  Noise schedule: β₁ &lt; β₂ &lt; ... &lt; β_T  (small to large noise)
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>
+</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>  Shortcut (jump to any timestep):
+</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>  q(xₜ | x₀) = N(xₜ ; √ᾱₜ x₀, (1-ᾱₜ)I)
+</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>  where ᾱₜ = Π(1-βᵢ) for i=1..t
+</span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>
+</span><span id="__span-2-10"><a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a>  → xₜ = √ᾱₜ x₀ + √(1-ᾱₜ) ε,  ε ~ N(0,I)
+</span><span id="__span-2-11"><a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a>
+</span><span id="__span-2-12"><a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a>Reverse Process (learned neural network):
+</span><span id="__span-2-13"><a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a>  pθ(xₜ₋₁ | xₜ) = N(xₜ₋₁ ; μθ(xₜ, t), σₜ²I)
+</span><span id="__span-2-14"><a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a>
+</span><span id="__span-2-15"><a id="__codelineno-2-15" name="__codelineno-2-15" href="#__codelineno-2-15"></a>  The network εθ predicts the noise:
+</span><span id="__span-2-16"><a id="__codelineno-2-16" name="__codelineno-2-16" href="#__codelineno-2-16"></a>  μθ(xₜ, t) = (1/√αₜ)(xₜ - (βₜ/√(1-ᾱₜ)) εθ(xₜ, t))
+</span><span id="__span-2-17"><a id="__codelineno-2-17" name="__codelineno-2-17" href="#__codelineno-2-17"></a>
+</span><span id="__span-2-18"><a id="__codelineno-2-18" name="__codelineno-2-18" href="#__codelineno-2-18"></a>Training Loss (simplified):
+</span><span id="__span-2-19"><a id="__codelineno-2-19" name="__codelineno-2-19" href="#__codelineno-2-19"></a>  L = E[‖ε - εθ(xₜ, t)‖²]
+</span><span id="__span-2-20"><a id="__codelineno-2-20" name="__codelineno-2-20" href="#__codelineno-2-20"></a>
+</span><span id="__span-2-21"><a id="__codelineno-2-21" name="__codelineno-2-21" href="#__codelineno-2-21"></a>  &quot;Predict the noise that was added&quot; — that&#39;s the entire training!
+</span></code></pre></div>
+<h3 id="ddpm-training-loss-and-the-elbo">DDPM Training Loss and the ELBO<a class="headerlink" href="#ddpm-training-loss-and-the-elbo" title="Permanent link">&para;</a></h3>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>Why does predicting noise work? Connection to variational inference:
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>  The full ELBO (Evidence Lower Bound) on log p(x₀) decomposes as:
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>    ELBO = E[log p_θ(x₀|x₁)]              ← reconstruction term
+</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>         - D_KL[q(x_T|x₀) || p(x_T)]     ← prior matching term
+</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>         - Σ_t D_KL[q(xₜ₋₁|xₜ,x₀) || p_θ(xₜ₋₁|xₜ)]  ← denoising terms
+</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>
+</span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>  Each D_KL denoising term at timestep t reduces to a noise-prediction MSE:
+</span><span id="__span-3-10"><a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a>
+</span><span id="__span-3-11"><a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a>    L_t ∝ E[‖ε - εθ(xₜ, t)‖²]
+</span><span id="__span-3-12"><a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a>
+</span><span id="__span-3-13"><a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a>  Ho et al. (DDPM) showed that the SIMPLIFIED loss — equal weighting
+</span><span id="__span-3-14"><a id="__codelineno-3-14" name="__codelineno-3-14" href="#__codelineno-3-14"></a>  across all timesteps instead of the VLB&#39;s per-timestep weighting —
+</span><span id="__span-3-15"><a id="__codelineno-3-15" name="__codelineno-3-15" href="#__codelineno-3-15"></a>  works BETTER in practice despite being a looser bound.
+</span><span id="__span-3-16"><a id="__codelineno-3-16" name="__codelineno-3-16" href="#__codelineno-3-16"></a>
+</span><span id="__span-3-17"><a id="__codelineno-3-17" name="__codelineno-3-17" href="#__codelineno-3-17"></a>  Key insight:
+</span><span id="__span-3-18"><a id="__codelineno-3-18" name="__codelineno-3-18" href="#__codelineno-3-18"></a>    Simplified loss ← a reweighted (looser) version of the ELBO
+</span><span id="__span-3-19"><a id="__codelineno-3-19" name="__codelineno-3-19" href="#__codelineno-3-19"></a>    This connects diffusion models to the VAE framework:
+</span><span id="__span-3-20"><a id="__codelineno-3-20" name="__codelineno-3-20" href="#__codelineno-3-20"></a>      VAE encoder  ↔  forward process q(xₜ|x₀)  (fixed, not learned)
+</span><span id="__span-3-21"><a id="__codelineno-3-21" name="__codelineno-3-21" href="#__codelineno-3-21"></a>      VAE decoder  ↔  reverse process p_θ(xₜ₋₁|xₜ)  (learned denoiser)
+</span><span id="__span-3-22"><a id="__codelineno-3-22" name="__codelineno-3-22" href="#__codelineno-3-22"></a>      ELBO         ↔  variational lower bound on log p(x₀)
+</span></code></pre></div>
+<h3 id="the-u-net-architecture-for-diffusion">The U-Net Architecture for Diffusion<a class="headerlink" href="#the-u-net-architecture-for-diffusion" title="Permanent link">&para;</a></h3>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>U-Net: The workhorse architecture for noise prediction
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>Input: noisy image xₜ + timestep t
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>Output: predicted noise εθ
+</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>
+</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>     ┌──────────────────────────────────────────┐
+</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>     │            Skip Connections               │
+</span><span id="__span-4-8"><a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a>     │   ┌─────────────────────────────────┐    │
+</span><span id="__span-4-9"><a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a>     │   │                                 │    │
+</span><span id="__span-4-10"><a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a>    64 ──┤ Down ──128 ── Down ──256 ── Mid ──256 ── Up ──128 ── Up ──64
+</span><span id="__span-4-11"><a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a>     │   │  │               │                        │          │
+</span><span id="__span-4-12"><a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a>     │   │  └───────────────┼────────────────────────┘          │
+</span><span id="__span-4-13"><a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a>     │   │                  └───────────────────────────────────┘
+</span><span id="__span-4-14"><a id="__codelineno-4-14" name="__codelineno-4-14" href="#__codelineno-4-14"></a>     │   └─────────────────────────────────────────────────────────── Out
+</span><span id="__span-4-15"><a id="__codelineno-4-15" name="__codelineno-4-15" href="#__codelineno-4-15"></a>     │
+</span><span id="__span-4-16"><a id="__codelineno-4-16" name="__codelineno-4-16" href="#__codelineno-4-16"></a>     │  + Time embedding (sinusoidal, added/concat at each block)
+</span><span id="__span-4-17"><a id="__codelineno-4-17" name="__codelineno-4-17" href="#__codelineno-4-17"></a>     │  + Text embedding (cross-attention from text encoder)
+</span><span id="__span-4-18"><a id="__codelineno-4-18" name="__codelineno-4-18" href="#__codelineno-4-18"></a>     └──────────────────────────────────────────┘
+</span><span id="__span-4-19"><a id="__codelineno-4-19" name="__codelineno-4-19" href="#__codelineno-4-19"></a>
+</span><span id="__span-4-20"><a id="__codelineno-4-20" name="__codelineno-4-20" href="#__codelineno-4-20"></a>Components:
+</span><span id="__span-4-21"><a id="__codelineno-4-21" name="__codelineno-4-21" href="#__codelineno-4-21"></a>  ResNet blocks:     Convolution + normalization + activation
+</span><span id="__span-4-22"><a id="__codelineno-4-22" name="__codelineno-4-22" href="#__codelineno-4-22"></a>  Self-attention:    Attend to other spatial positions (global context)
+</span><span id="__span-4-23"><a id="__codelineno-4-23" name="__codelineno-4-23" href="#__codelineno-4-23"></a>  Cross-attention:   Attend to text embeddings (conditioning)
+</span><span id="__span-4-24"><a id="__codelineno-4-24" name="__codelineno-4-24" href="#__codelineno-4-24"></a>  Time embedding:    Sinusoidal position encoding for timestep t
+</span><span id="__span-4-25"><a id="__codelineno-4-25" name="__codelineno-4-25" href="#__codelineno-4-25"></a>  Skip connections:  U-Net&#39;s hallmark — preserve high-res details
+</span></code></pre></div>
+<h3 id="from-ddpm-to-modern-diffusion">From DDPM to Modern Diffusion<a class="headerlink" href="#from-ddpm-to-modern-diffusion" title="Permanent link">&para;</a></h3>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>Evolution:
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>DDPM (2020):     1000 denoising steps → slow!
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>                 ~30 seconds per image
+</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>
+</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>DDIM (2020):     Deterministic sampling, skip steps
+</span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a>                 50-100 steps sufficient → faster
+</span><span id="__span-5-8"><a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a>
+</span><span id="__span-5-9"><a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a>Classifier       Guide diffusion with class labels
+</span><span id="__span-5-10"><a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a>Guidance (2021): Scale: w × ε_conditional + (1-w) × ε_unconditional
+</span><span id="__span-5-11"><a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a>
+</span><span id="__span-5-12"><a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a>Classifier-Free  Train with/without conditioning (random dropout)
+</span><span id="__span-5-13"><a id="__codelineno-5-13" name="__codelineno-5-13" href="#__codelineno-5-13"></a>Guidance (2022): No separate classifier needed
+</span><span id="__span-5-14"><a id="__codelineno-5-14" name="__codelineno-5-14" href="#__codelineno-5-14"></a>                 CFG scale controls adherence to prompt (7-15 typical)
+</span><span id="__span-5-15"><a id="__codelineno-5-15" name="__codelineno-5-15" href="#__codelineno-5-15"></a>
+</span><span id="__span-5-16"><a id="__codelineno-5-16" name="__codelineno-5-16" href="#__codelineno-5-16"></a>                 ε̃ = ε_uncond + s × (ε_cond - ε_uncond)
+</span><span id="__span-5-17"><a id="__codelineno-5-17" name="__codelineno-5-17" href="#__codelineno-5-17"></a>                 s &gt; 1: stronger prompt adherence (less diversity)
+</span><span id="__span-5-18"><a id="__codelineno-5-18" name="__codelineno-5-18" href="#__codelineno-5-18"></a>                 s = 1: standard conditional generation
+</span><span id="__span-5-19"><a id="__codelineno-5-19" name="__codelineno-5-19" href="#__codelineno-5-19"></a>
+</span><span id="__span-5-20"><a id="__codelineno-5-20" name="__codelineno-5-20" href="#__codelineno-5-20"></a>Latent Diffusion  Diffuse in LATENT space, not pixel space!
+</span><span id="__span-5-21"><a id="__codelineno-5-21" name="__codelineno-5-21" href="#__codelineno-5-21"></a>(Stable Diff):    Image → VAE encoder → latent → diffuse → VAE decode
+</span><span id="__span-5-22"><a id="__codelineno-5-22" name="__codelineno-5-22" href="#__codelineno-5-22"></a>                  64×64 latent instead of 512×512 pixels = 64× cheaper
+</span><span id="__span-5-23"><a id="__codelineno-5-23" name="__codelineno-5-23" href="#__codelineno-5-23"></a>
+</span><span id="__span-5-24"><a id="__codelineno-5-24" name="__codelineno-5-24" href="#__codelineno-5-24"></a>                  ┌─────────┐   ┌───────────┐   ┌─────────┐
+</span><span id="__span-5-25"><a id="__codelineno-5-25" name="__codelineno-5-25" href="#__codelineno-5-25"></a>                  │  Text   │   │  Latent   │   │   VAE   │
+</span><span id="__span-5-26"><a id="__codelineno-5-26" name="__codelineno-5-26" href="#__codelineno-5-26"></a>                  │ Encoder │──▶│ Diffusion │──▶│ Decoder │──▶ Image
+</span><span id="__span-5-27"><a id="__codelineno-5-27" name="__codelineno-5-27" href="#__codelineno-5-27"></a>                  │ (CLIP)  │   │  (U-Net)  │   │         │
+</span><span id="__span-5-28"><a id="__codelineno-5-28" name="__codelineno-5-28" href="#__codelineno-5-28"></a>                  └─────────┘   └───────────┘   └─────────┘
+</span></code></pre></div>
+<hr />
+<h2 id="143-text-to-image-systems">14.3 Text-to-Image Systems<a class="headerlink" href="#143-text-to-image-systems" title="Permanent link">&para;</a></h2>
+<h3 id="dall-e-evolution">DALL-E Evolution<a class="headerlink" href="#dall-e-evolution" title="Permanent link">&para;</a></h3>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>DALL-E 1 (2021):  Discrete VAE + autoregressive transformer
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>                  Tokenize image into 32×32 grid of discrete tokens
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>                  Generate tokens autoregressively (like text!)
+</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>
+</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>DALL-E 2 (2022):  CLIP text encoder → prior (diffusion) → decoder (diffusion)
+</span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>                  Two-stage: text → CLIP image embedding → pixels
+</span><span id="__span-6-7"><a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a>                  Uniter: CLIP connects text and image spaces
+</span><span id="__span-6-8"><a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a>
+</span><span id="__span-6-9"><a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a>DALL-E 3 (2023):  Much better prompt following
+</span><span id="__span-6-10"><a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a>                  Key innovation: Improved training data with
+</span><span id="__span-6-11"><a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a>                  synthetic captions (re-caption all training images
+</span><span id="__span-6-12"><a id="__codelineno-6-12" name="__codelineno-6-12" href="#__codelineno-6-12"></a>                  with a captioning model for better text alignment)
+</span><span id="__span-6-13"><a id="__codelineno-6-13" name="__codelineno-6-13" href="#__codelineno-6-13"></a>                  Integrated with ChatGPT for prompt rewriting
+</span></code></pre></div>
+<h3 id="stable-diffusion-architecture">Stable Diffusion Architecture<a class="headerlink" href="#stable-diffusion-architecture" title="Permanent link">&para;</a></h3>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>┌──────────────────────────────────────────────────────────────────┐
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>│              Stable Diffusion Pipeline                            │
+</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>│                                                                   │
+</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>│  &quot;A photo of a cat wearing a top hat, oil painting style&quot;        │
+</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>│       │                                                           │
+</span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a>│       ▼                                                           │
+</span><span id="__span-7-7"><a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a>│  ┌──────────────┐                                                │
+</span><span id="__span-7-8"><a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a>│  │ Text Encoder │  CLIP ViT-L/14 or OpenCLIP                    │
+</span><span id="__span-7-9"><a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a>│  │ (frozen)     │  Tokenize → 77 tokens → 768-dim embeddings    │
+</span><span id="__span-7-10"><a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a>│  └──────┬───────┘                                                │
+</span><span id="__span-7-11"><a id="__codelineno-7-11" name="__codelineno-7-11" href="#__codelineno-7-11"></a>│         │ text embeddings                                        │
+</span><span id="__span-7-12"><a id="__codelineno-7-12" name="__codelineno-7-12" href="#__codelineno-7-12"></a>│         ▼                                                        │
+</span><span id="__span-7-13"><a id="__codelineno-7-13" name="__codelineno-7-13" href="#__codelineno-7-13"></a>│  ┌──────────────────────────────────┐                            │
+</span><span id="__span-7-14"><a id="__codelineno-7-14" name="__codelineno-7-14" href="#__codelineno-7-14"></a>│  │      U-Net (noise predictor)    │                             │
+</span><span id="__span-7-15"><a id="__codelineno-7-15" name="__codelineno-7-15" href="#__codelineno-7-15"></a>│  │                                  │                             │
+</span><span id="__span-7-16"><a id="__codelineno-7-16" name="__codelineno-7-16" href="#__codelineno-7-16"></a>│  │  Input: noisy latent (4×64×64)  │                             │
+</span><span id="__span-7-17"><a id="__codelineno-7-17" name="__codelineno-7-17" href="#__codelineno-7-17"></a>│  │  + timestep embedding           │                             │
+</span><span id="__span-7-18"><a id="__codelineno-7-18" name="__codelineno-7-18" href="#__codelineno-7-18"></a>│  │  + text cross-attention         │     ← text controls image   │
+</span><span id="__span-7-19"><a id="__codelineno-7-19" name="__codelineno-7-19" href="#__codelineno-7-19"></a>│  │                                  │                             │
+</span><span id="__span-7-20"><a id="__codelineno-7-20" name="__codelineno-7-20" href="#__codelineno-7-20"></a>│  │  Iteratively denoise:           │                             │
+</span><span id="__span-7-21"><a id="__codelineno-7-21" name="__codelineno-7-21" href="#__codelineno-7-21"></a>│  │  z_T → z_{T-1} → ... → z_0     │                             │
+</span><span id="__span-7-22"><a id="__codelineno-7-22" name="__codelineno-7-22" href="#__codelineno-7-22"></a>│  └──────┬───────────────────────────┘                            │
+</span><span id="__span-7-23"><a id="__codelineno-7-23" name="__codelineno-7-23" href="#__codelineno-7-23"></a>│         │ cleaned latent z₀                                      │
+</span><span id="__span-7-24"><a id="__codelineno-7-24" name="__codelineno-7-24" href="#__codelineno-7-24"></a>│         ▼                                                        │
+</span><span id="__span-7-25"><a id="__codelineno-7-25" name="__codelineno-7-25" href="#__codelineno-7-25"></a>│  ┌──────────────┐                                                │
+</span><span id="__span-7-26"><a id="__codelineno-7-26" name="__codelineno-7-26" href="#__codelineno-7-26"></a>│  │ VAE Decoder  │  Latent (4×64×64) → Image (3×512×512)         │
+</span><span id="__span-7-27"><a id="__codelineno-7-27" name="__codelineno-7-27" href="#__codelineno-7-27"></a>│  │ (frozen)     │                                                │
+</span><span id="__span-7-28"><a id="__codelineno-7-28" name="__codelineno-7-28" href="#__codelineno-7-28"></a>│  └──────────────┘                                                │
+</span><span id="__span-7-29"><a id="__codelineno-7-29" name="__codelineno-7-29" href="#__codelineno-7-29"></a>│                                                                   │
+</span><span id="__span-7-30"><a id="__codelineno-7-30" name="__codelineno-7-30" href="#__codelineno-7-30"></a>│  Total: ~1B parameters (U-Net) + encoders/decoders               │
+</span><span id="__span-7-31"><a id="__codelineno-7-31" name="__codelineno-7-31" href="#__codelineno-7-31"></a>└──────────────────────────────────────────────────────────────────┘
+</span></code></pre></div>
+<h3 id="diffusion-transformers-dit-the-future">Diffusion Transformers (DiT) — The Future<a class="headerlink" href="#diffusion-transformers-dit-the-future" title="Permanent link">&para;</a></h3>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>Evolution: U-Net → Transformer
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>
+</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>Why DiT?
+</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>  U-Net was borrowed from segmentation → not designed for generation
+</span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>  Transformers scale better with data and compute (scaling laws!)
+</span><span id="__span-8-6"><a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a>
+</span><span id="__span-8-7"><a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a>DiT Architecture:
+</span><span id="__span-8-8"><a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a>  Replace U-Net with a Vision Transformer:
+</span><span id="__span-8-9"><a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a>
+</span><span id="__span-8-10"><a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a>  Noisy latent patches    +  Time embedding  +  Text conditioning
+</span><span id="__span-8-11"><a id="__codelineno-8-11" name="__codelineno-8-11" href="#__codelineno-8-11"></a>         │                        │                   │
+</span><span id="__span-8-12"><a id="__codelineno-8-12" name="__codelineno-8-12" href="#__codelineno-8-12"></a>         ▼                        ▼                   ▼
+</span><span id="__span-8-13"><a id="__codelineno-8-13" name="__codelineno-8-13" href="#__codelineno-8-13"></a>  ┌─────────────────────────────────────────────────────────┐
+</span><span id="__span-8-14"><a id="__codelineno-8-14" name="__codelineno-8-14" href="#__codelineno-8-14"></a>  │            Transformer Blocks (DiT Block)                │
+</span><span id="__span-8-15"><a id="__codelineno-8-15" name="__codelineno-8-15" href="#__codelineno-8-15"></a>  │                                                          │
+</span><span id="__span-8-16"><a id="__codelineno-8-16" name="__codelineno-8-16" href="#__codelineno-8-16"></a>  │  [AdaLN] → [Self-Attention] → [Cross-Attention] → [FFN] │
+</span><span id="__span-8-17"><a id="__codelineno-8-17" name="__codelineno-8-17" href="#__codelineno-8-17"></a>  │                                                          │
+</span><span id="__span-8-18"><a id="__codelineno-8-18" name="__codelineno-8-18" href="#__codelineno-8-18"></a>  │  AdaLN: Adaptive Layer Norm (condition on time + text)   │
+</span><span id="__span-8-19"><a id="__codelineno-8-19" name="__codelineno-8-19" href="#__codelineno-8-19"></a>  │  Works just like a decoder-only transformer!             │
+</span><span id="__span-8-20"><a id="__codelineno-8-20" name="__codelineno-8-20" href="#__codelineno-8-20"></a>  └─────────────────────────────────────────────────────────┘
+</span><span id="__span-8-21"><a id="__codelineno-8-21" name="__codelineno-8-21" href="#__codelineno-8-21"></a>         │
+</span><span id="__span-8-22"><a id="__codelineno-8-22" name="__codelineno-8-22" href="#__codelineno-8-22"></a>         ▼
+</span><span id="__span-8-23"><a id="__codelineno-8-23" name="__codelineno-8-23" href="#__codelineno-8-23"></a>  Predicted noise
+</span><span id="__span-8-24"><a id="__codelineno-8-24" name="__codelineno-8-24" href="#__codelineno-8-24"></a>
+</span><span id="__span-8-25"><a id="__codelineno-8-25" name="__codelineno-8-25" href="#__codelineno-8-25"></a>AdaLN Mechanism (Adaptive Layer Norm):
+</span><span id="__span-8-26"><a id="__codelineno-8-26" name="__codelineno-8-26" href="#__codelineno-8-26"></a>  Standard LayerNorm:  y = γ · x̂ + β   (γ, β are fixed learned parameters)
+</span><span id="__span-8-27"><a id="__codelineno-8-27" name="__codelineno-8-27" href="#__codelineno-8-27"></a>  AdaLN:               y = γ(c) · x̂ + β(c)
+</span><span id="__span-8-28"><a id="__codelineno-8-28" name="__codelineno-8-28" href="#__codelineno-8-28"></a>                       γ(c) and β(c) are OUTPUT of a small MLP given c
+</span><span id="__span-8-29"><a id="__codelineno-8-29" name="__codelineno-8-29" href="#__codelineno-8-29"></a>
+</span><span id="__span-8-30"><a id="__codelineno-8-30" name="__codelineno-8-30" href="#__codelineno-8-30"></a>  Conditioning signal c = timestep embedding + text embedding (summed/concat)
+</span><span id="__span-8-31"><a id="__codelineno-8-31" name="__codelineno-8-31" href="#__codelineno-8-31"></a>  The MLP predicts scale and shift for EACH transformer block independently.
+</span><span id="__span-8-32"><a id="__codelineno-8-32" name="__codelineno-8-32" href="#__codelineno-8-32"></a>
+</span><span id="__span-8-33"><a id="__codelineno-8-33" name="__codelineno-8-33" href="#__codelineno-8-33"></a>  Why AdaLN beats additive conditioning:
+</span><span id="__span-8-34"><a id="__codelineno-8-34" name="__codelineno-8-34" href="#__codelineno-8-34"></a>    Additive:   h = h + f(c)        — shifts features, same scale
+</span><span id="__span-8-35"><a id="__codelineno-8-35" name="__codelineno-8-35" href="#__codelineno-8-35"></a>    AdaLN:      h = γ(c)·norm(h) + β(c)  — controls both magnitude AND bias
+</span><span id="__span-8-36"><a id="__codelineno-8-36" name="__codelineno-8-36" href="#__codelineno-8-36"></a>    → More expressive: conditioning can suppress or amplify entire feature dims
+</span><span id="__span-8-37"><a id="__codelineno-8-37" name="__codelineno-8-37" href="#__codelineno-8-37"></a>    → More efficient: avoids cross-attention overhead at every layer
+</span><span id="__span-8-38"><a id="__codelineno-8-38" name="__codelineno-8-38" href="#__codelineno-8-38"></a>    → Empirically stronger signal integration than simple addition
+</span><span id="__span-8-39"><a id="__codelineno-8-39" name="__codelineno-8-39" href="#__codelineno-8-39"></a>
+</span><span id="__span-8-40"><a id="__codelineno-8-40" name="__codelineno-8-40" href="#__codelineno-8-40"></a>Used in: DALL-E 3, Stable Diffusion 3, Flux, Sora
+</span></code></pre></div>
+<h3 id="clip-connecting-language-and-vision">CLIP — Connecting Language and Vision<a class="headerlink" href="#clip-connecting-language-and-vision" title="Permanent link">&para;</a></h3>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>CLIP Training (Contrastive Language-Image Pre-training):
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>
+</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>  Batch of (image, text) pairs:
+</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a>
+</span><span id="__span-9-5"><a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a>  Image Encoder    Text Encoder
+</span><span id="__span-9-6"><a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a>  (ViT or ResNet)  (Transformer)
+</span><span id="__span-9-7"><a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a>       │                │
+</span><span id="__span-9-8"><a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a>       ▼                ▼
+</span><span id="__span-9-9"><a id="__codelineno-9-9" name="__codelineno-9-9" href="#__codelineno-9-9"></a>  Image embeddings  Text embeddings
+</span><span id="__span-9-10"><a id="__codelineno-9-10" name="__codelineno-9-10" href="#__codelineno-9-10"></a>      [I₁]              [T₁]     ← should be close (matching pair)
+</span><span id="__span-9-11"><a id="__codelineno-9-11" name="__codelineno-9-11" href="#__codelineno-9-11"></a>      [I₂]              [T₂]     ← should be close
+</span><span id="__span-9-12"><a id="__codelineno-9-12" name="__codelineno-9-12" href="#__codelineno-9-12"></a>      [I₃]              [T₃]     ← should be close
+</span><span id="__span-9-13"><a id="__codelineno-9-13" name="__codelineno-9-13" href="#__codelineno-9-13"></a>
+</span><span id="__span-9-14"><a id="__codelineno-9-14" name="__codelineno-9-14" href="#__codelineno-9-14"></a>  Similarity matrix:
+</span><span id="__span-9-15"><a id="__codelineno-9-15" name="__codelineno-9-15" href="#__codelineno-9-15"></a>           T₁    T₂    T₃
+</span><span id="__span-9-16"><a id="__codelineno-9-16" name="__codelineno-9-16" href="#__codelineno-9-16"></a>    I₁  [ HIGH  low   low  ]    maximize diagonal
+</span><span id="__span-9-17"><a id="__codelineno-9-17" name="__codelineno-9-17" href="#__codelineno-9-17"></a>    I₂  [ low   HIGH  low  ]    minimize off-diagonal
+</span><span id="__span-9-18"><a id="__codelineno-9-18" name="__codelineno-9-18" href="#__codelineno-9-18"></a>    I₃  [ low   low   HIGH ]
+</span><span id="__span-9-19"><a id="__codelineno-9-19" name="__codelineno-9-19" href="#__codelineno-9-19"></a>
+</span><span id="__span-9-20"><a id="__codelineno-9-20" name="__codelineno-9-20" href="#__codelineno-9-20"></a>  Loss: InfoNCE (contrastive) — symmetric cross-entropy
+</span><span id="__span-9-21"><a id="__codelineno-9-21" name="__codelineno-9-21" href="#__codelineno-9-21"></a>
+</span><span id="__span-9-22"><a id="__codelineno-9-22" name="__codelineno-9-22" href="#__codelineno-9-22"></a>  Result: Shared embedding space for text AND images
+</span><span id="__span-9-23"><a id="__codelineno-9-23" name="__codelineno-9-23" href="#__codelineno-9-23"></a>
+</span><span id="__span-9-24"><a id="__codelineno-9-24" name="__codelineno-9-24" href="#__codelineno-9-24"></a>  Applications:
+</span><span id="__span-9-25"><a id="__codelineno-9-25" name="__codelineno-9-25" href="#__codelineno-9-25"></a>    - Image-text matching (search by description)
+</span><span id="__span-9-26"><a id="__codelineno-9-26" name="__codelineno-9-26" href="#__codelineno-9-26"></a>    - Zero-shot image classification (no training needed!)
+</span><span id="__span-9-27"><a id="__codelineno-9-27" name="__codelineno-9-27" href="#__codelineno-9-27"></a>    - Vision encoder for multimodal LLMs (LLaVA, GPT-4V)
+</span><span id="__span-9-28"><a id="__codelineno-9-28" name="__codelineno-9-28" href="#__codelineno-9-28"></a>    - Guiding diffusion models (text conditioning)
+</span></code></pre></div>
+<hr />
+<h2 id="144-image-editing-controlled-generation">14.4 Image Editing &amp; Controlled Generation<a class="headerlink" href="#144-image-editing-controlled-generation" title="Permanent link">&para;</a></h2>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>┌──────────────────────────────────────────────────────────────────┐
+</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>│              Controlled Generation Techniques                     │
+</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>├──────────────┬──────────────────────────────────────────────────┤
+</span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a>│ Img2Img      │ Start from partially noised source image         │
+</span><span id="__span-10-5"><a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a>│              │ instead of pure noise → preserves structure      │
+</span><span id="__span-10-6"><a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a>├──────────────┼──────────────────────────────────────────────────┤
+</span><span id="__span-10-7"><a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a>│ Inpainting   │ Mask part of image → only generate in masked     │
+</span><span id="__span-10-8"><a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a>│              │ region → edit specific regions                   │
+</span><span id="__span-10-9"><a id="__codelineno-10-9" name="__codelineno-10-9" href="#__codelineno-10-9"></a>├──────────────┼──────────────────────────────────────────────────┤
+</span><span id="__span-10-10"><a id="__codelineno-10-10" name="__codelineno-10-10" href="#__codelineno-10-10"></a>│ ControlNet   │ Additional conditioning with spatial controls:    │
+</span><span id="__span-10-11"><a id="__codelineno-10-11" name="__codelineno-10-11" href="#__codelineno-10-11"></a>│              │ edge maps, depth maps, pose, segmentation        │
+</span><span id="__span-10-12"><a id="__codelineno-10-12" name="__codelineno-10-12" href="#__codelineno-10-12"></a>│              │ Preserves composition while changing style        │
+</span><span id="__span-10-13"><a id="__codelineno-10-13" name="__codelineno-10-13" href="#__codelineno-10-13"></a>└──────────────┴──────────────────────────────────────────────────┘
+</span><span id="__span-10-14"><a id="__codelineno-10-14" name="__codelineno-10-14" href="#__codelineno-10-14"></a>
+</span><span id="__span-10-15"><a id="__codelineno-10-15" name="__codelineno-10-15" href="#__codelineno-10-15"></a>### ControlNet Architecture — Zero Convolutions
+</span></code></pre></div>
+<p>How ControlNet injects spatial control without breaking the base model:</p>
+<p>Original U-Net encoder (FROZEN — weights never change)
+│ ┌── skip connections ──┐
+│ exact copy │ │
+▼ (trainable) │ ▼
+ControlNet encoder copy ──zero conv──▶ U-Net decoder
+│
+▲
+Control signal (edge map, depth map, pose skeleton, ...)</p>
+<p>"Zero convolutions" = 1×1 convolutions initialized with weights=0, bias=0</p>
+<p>Why zero initialization matters:
+At training step 0: zero conv outputs 0 → adds nothing to the U-Net
+→ ControlNet starts with ZERO effect on the frozen model
+→ No risk of corrupting the pre-trained weights on first steps
+→ Gradually learns to inject spatial guidance as weights grow from zero</p>
+<p>Training: freeze original U-Net, train only the copy + zero convs
+Add control signal outputs to the original U-Net's skip connections
+Result: spatial structure (pose, edges) preserved while text controls style</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>
+</span></code></pre></div>
+<p>┌──────────────┬──────────────────────────────────────────────────┐
+│ IP-Adapter │ Image prompt adapter — use a reference image │
+│ │ as a style/content guide │
+├──────────────┼──────────────────────────────────────────────────┤
+│ LoRA for │ Fine-tune diffusion model with ~100 images │
+│ Diffusion │ of a specific style/character/concept │
+│ │ Same low-rank adaptation as for LLMs! │
+├──────────────┼──────────────────────────────────────────────────┤
+│ Textual │ Learn a new "word" embedding for a concept │
+│ Inversion │ from few images — &lt;<my_style>&gt; in prompts │
+└──────────────┴──────────────────────────────────────────────────┘</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>---
+</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>
+</span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a>## 14.5 Video Generation
+</span></code></pre></div>
+<p>Video = Image sequence with temporal consistency</p>
+<p>Challenges:</p>
+<ol>
+<li>Temporal coherence (objects don't flicker/teleport)</li>
+<li>Compute cost (3D data: height × width × time × channels)</li>
+<li>Motion understanding (physics, gravity, dynamics)</li>
+<li>Long-range consistency (beginning matches end)</li>
+</ol>
+<p>Architecture Approaches:</p>
+<p>┌──────────────────────────────────────────────────────────┐
+│ Sora (OpenAI, 2024): │
+│ │
+│ Video → "spacetime patches" (3D tokens) │
+│ Diffusion Transformer in latent space │
+│ Can generate variable resolution/aspect ratio/duration │
+│ Trained on massive video + image data │
+│ │
+│ 3D Patch Tokenization: │
+│ ┌────┬────┐ ┌────┬────┐ ┌────┬────┐ │
+│ │ P1 │ P2 │ │ P5 │ P6 │ │ P9 │P10 │ │
+│ ├────┼────┤ ├────┼────┤ ├────┼────┤ │
+│ │ P3 │ P4 │ │ P7 │ P8 │ │P11 │P12 │ │
+│ └────┴────┘ └────┴────┘ └────┴────┘ │
+│ Frame 1 Frame 2 Frame 3 │
+│ │
+│ Each patch spans space AND time │
+│ → Temporal attention built into transformer │
+└──────────────────────────────────────────────────────────┘</p>
+<p>Key Models (2024-2026):
+Sora: Up to 1 minute, photorealistic
+Veo 2: Google, 4K resolution, good physics
+Runway Gen-3: Commercial, fast iteration
+Kling: Kuaishou, long video generation
+Wan: Open source video generation</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>---
+</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>
+</span><span id="__span-13-3"><a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a>## 14.6 Audio &amp; Speech AI
+</span><span id="__span-13-4"><a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a>
+</span><span id="__span-13-5"><a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a>### Speech-to-Text (Whisper)
+</span></code></pre></div>
+<p>Whisper Architecture (OpenAI):</p>
+<p>Audio (mel spectrogram)
+│
+▼
+┌──────────────────┐ ┌──────────────────┐
+│ Audio Encoder │───────▶│ Text Decoder │
+│ (Transformer) │ cross │ (Transformer) │
+│ │ attn │ │
+│ Log-mel spec │ │ Autoregressive │
+│ → 2D conv │ │ text generation │
+│ → transformer │ │ │
+└──────────────────┘ └──────────────────┘
+│
+▼
+"Hello, how are you?"</p>
+<p>Key features:</p>
+<ul>
+<li>Encoder-decoder (like T5, not like GPT)</li>
+<li>Trained on 680K hours of labeled audio</li>
+<li>Multilingual (100+ languages)</li>
+<li>Handles accents, noise, varied audio quality</li>
+<li>Can translate speech directly (any language → English)</li>
+</ul>
+<p>Special tokens: &lt;|startoftranscript|&gt;, &lt;|en|&gt;, &lt;|transcribe|&gt;
+Multi-task: transcribe, translate, timestamp, language detect</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>### Text-to-Speech (TTS)
+</span></code></pre></div>
+<p>Modern TTS Pipeline:</p>
+<p>Text → [Text Encoder] → [Duration/Acoustic Model] → [Vocoder] → Audio</p>
+<p>Evolution:
+Concatenative (2000s): Stitch pre-recorded clips
+Tacotron 2 (2017): Seq2seq → mel spectrogram → WaveNet
+VITS (2021): End-to-end, real-time, VAE + flow
+VALL-E (2023): Neural codec language model
+"GPT for speech" — 3 second voice clone!</p>
+<p>VALL-E Architecture: 1. Audio → Neural audio codec → Discrete tokens
+(like tokenizing text, but for audio)</p>
+<div class="language-text highlight"><pre><span></span><code>The codec uses Residual Vector Quantization (RVQ):
+
+  ┌─────────────────────────────────────────────────────────────┐
+  │  Audio waveform → CNN encoder → continuous features         │
+  │                                                              │
+  │  Layer 1 VQ:   quantize features        → codebook tokens C₁│
+  │                residual₁ = features - C₁  (what&#39;s left over) │
+  │  Layer 2 VQ:   quantize residual₁       → codebook tokens C₂│
+  │                residual₂ = residual₁ - C₂                   │
+  │  Layer 3 VQ:   quantize residual₂       → codebook tokens C₃│
+  │  ...                (repeat for all 8 layers)               │
+  │                                                              │
+  │  Result: audio → 8 parallel token streams at ~75 Hz         │
+  │    C₁ = coarse structure (speaker, prosody, rough phonemes)  │
+  │    C₂–C₈ = progressively finer acoustic detail              │
+  └─────────────────────────────────────────────────────────────┘
+
+  EnCodec / SoundStream both use this RVQ scheme.
+  More codebook layers = higher audio quality but more tokens.
+
+2. Text + 3-second voice sample → predict audio tokens
+   (autoregressive, like a language model!)
+   VALL-E generates C₁ autoregressively (captures semantics),
+   then generates C₂–C₈ NON-autoregressively in parallel (fast)
+3. Audio tokens → codec decoder → waveform
+
+This is fundamentally an LLM-style approach applied to audio.
+</code></pre></div>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>### Music Generation
+</span></code></pre></div>
+<p>MusicGen (Meta, 2023):
+Text/melody → music
+Architecture: Transformer LM over audio tokens
+Encodec audio codec → discrete tokens → autoregressive generation</p>
+<p>Suno / Udio (2024):
+Text → complete songs with vocals
+End-to-end, commercial quality
+Combine music generation + vocal synthesis</p>
+<p>Key insight:
+The same autoregressive transformer paradigm works for
+text, code, images (DALL-E 1), audio, and music!
+→ "Everything is a sequence of tokens"</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>---
+</span><span id="__span-16-2"><a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a>
+</span><span id="__span-16-3"><a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a>## 14.7 3D Generation &amp; Beyond
+</span></code></pre></div>
+<p>3D Generation Approaches:</p>
+<p>Text → 3D:
+Point-E (OpenAI): Text → point cloud → mesh
+Shap-E (OpenAI): Text → implicit 3D representation
+DreamFusion (2022): Optimize NeRF using 2D diffusion prior</p>
+<p>Image → 3D:
+Zero-1-to-3: Single image → 3D object
+Gaussian Splatting: Fast 3D from multi-view images</p>
+<p>NeRF (Neural Radiance Fields):
+Input: multiple photos of a scene
+Output: 3D representation (render from any angle)
+Learn: F(x, y, z, θ, φ) → (r, g, b, σ)
+3D position + viewing direction → color + volume density</p>
+<div class="language-text highlight"><pre><span></span><code>Volume Rendering Equation:
+  Cast a ray r(t) = o + td per pixel through the scene
+  Sample N points along the ray: t₁, t₂, ..., t_N
+
+  Accumulated color:  C = Σᵢ Tᵢ · (1 - exp(-σᵢ·δᵢ)) · cᵢ
+
+    where:
+      δᵢ        = distance between adjacent samples (step size)
+      σᵢ        = density at sample i (how opaque is this point?)
+      cᵢ        = color at sample i
+      Tᵢ        = exp(-Σⱼ&lt;ᵢ σⱼ·δⱼ) = transmittance (how much light
+                  reaches point i without being blocked)
+      (1-exp(-σᵢδᵢ)) = probability this sample emits visible light
+
+  Positional encoding: γ(p) = (sin(2⁰πp), cos(2⁰πp), ..., sin(2^Lπp), cos(2^Lπp))
+    Maps raw coordinates through sinusoids at multiple frequencies
+    Critical for capturing high-frequency detail (sharp edges, fine texture)
+    Without it, networks converge to blurry low-frequency functions
+</code></pre></div>
+<p>3D Gaussian Splatting (2023):
+Faster than NeRF (real-time rendering!)
+Represent scene as millions of 3D gaussians
+Each gaussian: position, covariance, color, opacity
+Differentiable rasterization for training</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>---
+</span><span id="__span-17-2"><a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a>
+</span><span id="__span-17-3"><a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a>## 14.8 Key Concepts Across Generative AI
+</span><span id="__span-17-4"><a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a>
+</span><span id="__span-17-5"><a id="__codelineno-17-5" name="__codelineno-17-5" href="#__codelineno-17-5"></a>### Latent Spaces
+</span></code></pre></div>
+<p>Every generative model operates in a latent space:</p>
+<p>VAE: Image → encoder → z (continuous, regularized) → decoder → image
+GAN: z (random) → generator → image
+Diffusion: Image → VAE → latent → noise/denoise → VAE → image
+LLM: Token → embedding → hidden states → output distribution</p>
+<p>Why latent spaces matter: - Compression: operate in lower dimensions (cheaper!) - Interpolation: smooth transitions between concepts - Disentanglement: separate factors of variation - Composition: combine concepts (style + content)</p>
+<p>Latent interpolation:</p>
+<p>z_cat ──── z_blend₁ ──── z_blend₂ ──── z_dog
+🐱 🐱🐕 🐕🐱 🐕</p>
+<p>Smooth transition in latent space → smooth transition in output</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a>### The Tokenization Pattern
+</span></code></pre></div>
+<p>Unifying principle: EVERYTHING can be tokenized</p>
+<p>Text: Words/subwords → token IDs → embeddings
+Images: Patches (ViT) or VAE latents → continuous/discrete tokens
+Audio: Mel spectrogram → codec tokens (EnCodec, SoundStream)
+Video: Spacetime patches → tokens
+3D: Point clouds or voxels → tokens
+Music: Audio codec tokens (same as speech)
+Code: Same as text (subword tokenization)
+Actions: Discretized continuous actions → tokens (RT-2)</p>
+<p>→ Once tokenized, the SAME transformer architecture works!
+→ This is why LLM techniques (attention, scaling, RLHF) transfer</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-19-1"><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a>### Evaluation Metrics for Generative Models
+</span></code></pre></div>
+<p>┌──────────────┬──────────────────────────────────────────────────┐
+│ FID (Fréchet │ Compare statistics of generated vs real images │
+│ Inception │ Lower = more realistic │
+│ Distance) │ Standard metric for image generation │
+├──────────────┼──────────────────────────────────────────────────┤
+│ CLIP Score │ Cosine similarity between generated image and │
+│ │ text prompt in CLIP space │
+│ │ Higher = better text-image alignment │
+├──────────────┼──────────────────────────────────────────────────┤
+│ Inception │ Quality (KL divergence of class predictions) │
+│ Score (IS) │ Higher = more realistic AND diverse │
+├──────────────┼──────────────────────────────────────────────────┤
+│ LPIPS │ Perceptual similarity using deep features │
+│ │ Lower = more perceptually similar │
+├──────────────┼──────────────────────────────────────────────────┤
+│ Human Eval │ Still the gold standard — Elo ratings from │
+│ │ pairwise human preferences (like Chatbot Arena) │
+├──────────────┼──────────────────────────────────────────────────┤
+│ WER (audio) │ Word Error Rate for speech recognition │
+│ │ Lower = better transcription │
+└──────────────┴──────────────────────────────────────────────────┘</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-20-1"><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a>---
+</span><span id="__span-20-2"><a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a>
+</span><span id="__span-20-3"><a id="__codelineno-20-3" name="__codelineno-20-3" href="#__codelineno-20-3"></a>## 14.9 Practical Implementation
+</span><span id="__span-20-4"><a id="__codelineno-20-4" name="__codelineno-20-4" href="#__codelineno-20-4"></a>
+</span><span id="__span-20-5"><a id="__codelineno-20-5" name="__codelineno-20-5" href="#__codelineno-20-5"></a>&lt;details&gt;
+</span><span id="__span-20-6"><a id="__codelineno-20-6" name="__codelineno-20-6" href="#__codelineno-20-6"></a>&lt;summary&gt;&lt;strong&gt;Complete Code: Simplified Diffusion Model&lt;/strong&gt;&lt;/summary&gt;
+</span><span id="__span-20-7"><a id="__codelineno-20-7" name="__codelineno-20-7" href="#__codelineno-20-7"></a>
+</span><span id="__span-20-8"><a id="__codelineno-20-8" name="__codelineno-20-8" href="#__codelineno-20-8"></a>```python
+</span><span id="__span-20-9"><a id="__codelineno-20-9" name="__codelineno-20-9" href="#__codelineno-20-9"></a>import numpy as np
+</span><span id="__span-20-10"><a id="__codelineno-20-10" name="__codelineno-20-10" href="#__codelineno-20-10"></a>
+</span><span id="__span-20-11"><a id="__codelineno-20-11" name="__codelineno-20-11" href="#__codelineno-20-11"></a>class SimpleDiffusion:
+</span><span id="__span-20-12"><a id="__codelineno-20-12" name="__codelineno-20-12" href="#__codelineno-20-12"></a>    &quot;&quot;&quot;
+</span><span id="__span-20-13"><a id="__codelineno-20-13" name="__codelineno-20-13" href="#__codelineno-20-13"></a>    Minimal diffusion model to understand the core algorithm.
+</span><span id="__span-20-14"><a id="__codelineno-20-14" name="__codelineno-20-14" href="#__codelineno-20-14"></a>    Uses a simple MLP as the noise predictor (real models use U-Net/DiT).
+</span><span id="__span-20-15"><a id="__codelineno-20-15" name="__codelineno-20-15" href="#__codelineno-20-15"></a>    &quot;&quot;&quot;
+</span><span id="__span-20-16"><a id="__codelineno-20-16" name="__codelineno-20-16" href="#__codelineno-20-16"></a>
+</span><span id="__span-20-17"><a id="__codelineno-20-17" name="__codelineno-20-17" href="#__codelineno-20-17"></a>    def __init__(self, data_dim=2, T=100):
+</span><span id="__span-20-18"><a id="__codelineno-20-18" name="__codelineno-20-18" href="#__codelineno-20-18"></a>        self.T = T  # number of diffusion steps
+</span><span id="__span-20-19"><a id="__codelineno-20-19" name="__codelineno-20-19" href="#__codelineno-20-19"></a>        self.data_dim = data_dim
+</span><span id="__span-20-20"><a id="__codelineno-20-20" name="__codelineno-20-20" href="#__codelineno-20-20"></a>
+</span><span id="__span-20-21"><a id="__codelineno-20-21" name="__codelineno-20-21" href="#__codelineno-20-21"></a>        # Noise schedule (linear)
+</span><span id="__span-20-22"><a id="__codelineno-20-22" name="__codelineno-20-22" href="#__codelineno-20-22"></a>        self.betas = np.linspace(0.0001, 0.02, T)
+</span><span id="__span-20-23"><a id="__codelineno-20-23" name="__codelineno-20-23" href="#__codelineno-20-23"></a>        self.alphas = 1 - self.betas
+</span><span id="__span-20-24"><a id="__codelineno-20-24" name="__codelineno-20-24" href="#__codelineno-20-24"></a>        self.alpha_bars = np.cumprod(self.alphas)
+</span><span id="__span-20-25"><a id="__codelineno-20-25" name="__codelineno-20-25" href="#__codelineno-20-25"></a>
+</span><span id="__span-20-26"><a id="__codelineno-20-26" name="__codelineno-20-26" href="#__codelineno-20-26"></a>        # Simple MLP noise predictor
+</span><span id="__span-20-27"><a id="__codelineno-20-27" name="__codelineno-20-27" href="#__codelineno-20-27"></a>        hidden = 128
+</span><span id="__span-20-28"><a id="__codelineno-20-28" name="__codelineno-20-28" href="#__codelineno-20-28"></a>        self.W1 = np.random.randn(data_dim + 1, hidden) * 0.1  # +1 for timestep
+</span><span id="__span-20-29"><a id="__codelineno-20-29" name="__codelineno-20-29" href="#__codelineno-20-29"></a>        self.b1 = np.zeros(hidden)
+</span><span id="__span-20-30"><a id="__codelineno-20-30" name="__codelineno-20-30" href="#__codelineno-20-30"></a>        self.W2 = np.random.randn(hidden, hidden) * 0.1
+</span><span id="__span-20-31"><a id="__codelineno-20-31" name="__codelineno-20-31" href="#__codelineno-20-31"></a>        self.b2 = np.zeros(hidden)
+</span><span id="__span-20-32"><a id="__codelineno-20-32" name="__codelineno-20-32" href="#__codelineno-20-32"></a>        self.W3 = np.random.randn(hidden, data_dim) * 0.1
+</span><span id="__span-20-33"><a id="__codelineno-20-33" name="__codelineno-20-33" href="#__codelineno-20-33"></a>        self.b3 = np.zeros(data_dim)
+</span><span id="__span-20-34"><a id="__codelineno-20-34" name="__codelineno-20-34" href="#__codelineno-20-34"></a>
+</span><span id="__span-20-35"><a id="__codelineno-20-35" name="__codelineno-20-35" href="#__codelineno-20-35"></a>    def predict_noise(self, x_t, t):
+</span><span id="__span-20-36"><a id="__codelineno-20-36" name="__codelineno-20-36" href="#__codelineno-20-36"></a>        &quot;&quot;&quot;Neural network that predicts the noise added at timestep t.&quot;&quot;&quot;
+</span><span id="__span-20-37"><a id="__codelineno-20-37" name="__codelineno-20-37" href="#__codelineno-20-37"></a>        # Normalize timestep to [0, 1]
+</span><span id="__span-20-38"><a id="__codelineno-20-38" name="__codelineno-20-38" href="#__codelineno-20-38"></a>        t_norm = np.array([[t / self.T]])
+</span><span id="__span-20-39"><a id="__codelineno-20-39" name="__codelineno-20-39" href="#__codelineno-20-39"></a>        inp = np.concatenate([x_t.reshape(1, -1), t_norm], axis=1)
+</span><span id="__span-20-40"><a id="__codelineno-20-40" name="__codelineno-20-40" href="#__codelineno-20-40"></a>
+</span><span id="__span-20-41"><a id="__codelineno-20-41" name="__codelineno-20-41" href="#__codelineno-20-41"></a>        h = np.maximum(0, inp @ self.W1 + self.b1)  # ReLU
+</span><span id="__span-20-42"><a id="__codelineno-20-42" name="__codelineno-20-42" href="#__codelineno-20-42"></a>        h = np.maximum(0, h @ self.W2 + self.b2)     # ReLU
+</span><span id="__span-20-43"><a id="__codelineno-20-43" name="__codelineno-20-43" href="#__codelineno-20-43"></a>        return (h @ self.W3 + self.b3).flatten()
+</span><span id="__span-20-44"><a id="__codelineno-20-44" name="__codelineno-20-44" href="#__codelineno-20-44"></a>
+</span><span id="__span-20-45"><a id="__codelineno-20-45" name="__codelineno-20-45" href="#__codelineno-20-45"></a>    def forward_diffusion(self, x_0, t):
+</span><span id="__span-20-46"><a id="__codelineno-20-46" name="__codelineno-20-46" href="#__codelineno-20-46"></a>        &quot;&quot;&quot;Add noise to x_0 according to schedule at timestep t.&quot;&quot;&quot;
+</span><span id="__span-20-47"><a id="__codelineno-20-47" name="__codelineno-20-47" href="#__codelineno-20-47"></a>        alpha_bar = self.alpha_bars[t]
+</span><span id="__span-20-48"><a id="__codelineno-20-48" name="__codelineno-20-48" href="#__codelineno-20-48"></a>        noise = np.random.randn(*x_0.shape)
+</span><span id="__span-20-49"><a id="__codelineno-20-49" name="__codelineno-20-49" href="#__codelineno-20-49"></a>        x_t = np.sqrt(alpha_bar) * x_0 + np.sqrt(1 - alpha_bar) * noise
+</span><span id="__span-20-50"><a id="__codelineno-20-50" name="__codelineno-20-50" href="#__codelineno-20-50"></a>        return x_t, noise
+</span><span id="__span-20-51"><a id="__codelineno-20-51" name="__codelineno-20-51" href="#__codelineno-20-51"></a>
+</span><span id="__span-20-52"><a id="__codelineno-20-52" name="__codelineno-20-52" href="#__codelineno-20-52"></a>    def train_step(self, x_0, lr=0.001):
+</span><span id="__span-20-53"><a id="__codelineno-20-53" name="__codelineno-20-53" href="#__codelineno-20-53"></a>        &quot;&quot;&quot;One training step: predict the noise that was added.&quot;&quot;&quot;
+</span><span id="__span-20-54"><a id="__codelineno-20-54" name="__codelineno-20-54" href="#__codelineno-20-54"></a>        # Random timestep
+</span><span id="__span-20-55"><a id="__codelineno-20-55" name="__codelineno-20-55" href="#__codelineno-20-55"></a>        t = np.random.randint(0, self.T)
+</span><span id="__span-20-56"><a id="__codelineno-20-56" name="__codelineno-20-56" href="#__codelineno-20-56"></a>
+</span><span id="__span-20-57"><a id="__codelineno-20-57" name="__codelineno-20-57" href="#__codelineno-20-57"></a>        # Add noise
+</span><span id="__span-20-58"><a id="__codelineno-20-58" name="__codelineno-20-58" href="#__codelineno-20-58"></a>        x_t, true_noise = self.forward_diffusion(x_0, t)
+</span><span id="__span-20-59"><a id="__codelineno-20-59" name="__codelineno-20-59" href="#__codelineno-20-59"></a>
+</span><span id="__span-20-60"><a id="__codelineno-20-60" name="__codelineno-20-60" href="#__codelineno-20-60"></a>        # Predict noise
+</span><span id="__span-20-61"><a id="__codelineno-20-61" name="__codelineno-20-61" href="#__codelineno-20-61"></a>        pred_noise = self.predict_noise(x_t, t)
+</span><span id="__span-20-62"><a id="__codelineno-20-62" name="__codelineno-20-62" href="#__codelineno-20-62"></a>
+</span><span id="__span-20-63"><a id="__codelineno-20-63" name="__codelineno-20-63" href="#__codelineno-20-63"></a>        # Loss = MSE between true and predicted noise
+</span><span id="__span-20-64"><a id="__codelineno-20-64" name="__codelineno-20-64" href="#__codelineno-20-64"></a>        loss = np.mean((true_noise - pred_noise) ** 2)
+</span><span id="__span-20-65"><a id="__codelineno-20-65" name="__codelineno-20-65" href="#__codelineno-20-65"></a>
+</span><span id="__span-20-66"><a id="__codelineno-20-66" name="__codelineno-20-66" href="#__codelineno-20-66"></a>        # Simplified gradient update (in practice, use autograd)
+</span><span id="__span-20-67"><a id="__codelineno-20-67" name="__codelineno-20-67" href="#__codelineno-20-67"></a>        # This is just to show the concept
+</span><span id="__span-20-68"><a id="__codelineno-20-68" name="__codelineno-20-68" href="#__codelineno-20-68"></a>        return loss
+</span><span id="__span-20-69"><a id="__codelineno-20-69" name="__codelineno-20-69" href="#__codelineno-20-69"></a>
+</span><span id="__span-20-70"><a id="__codelineno-20-70" name="__codelineno-20-70" href="#__codelineno-20-70"></a>    def sample(self):
+</span><span id="__span-20-71"><a id="__codelineno-20-71" name="__codelineno-20-71" href="#__codelineno-20-71"></a>        &quot;&quot;&quot;Generate a new sample by iterative denoising.&quot;&quot;&quot;
+</span><span id="__span-20-72"><a id="__codelineno-20-72" name="__codelineno-20-72" href="#__codelineno-20-72"></a>        # Start from pure noise
+</span><span id="__span-20-73"><a id="__codelineno-20-73" name="__codelineno-20-73" href="#__codelineno-20-73"></a>        x = np.random.randn(self.data_dim)
+</span><span id="__span-20-74"><a id="__codelineno-20-74" name="__codelineno-20-74" href="#__codelineno-20-74"></a>
+</span><span id="__span-20-75"><a id="__codelineno-20-75" name="__codelineno-20-75" href="#__codelineno-20-75"></a>        # Iteratively denoise
+</span><span id="__span-20-76"><a id="__codelineno-20-76" name="__codelineno-20-76" href="#__codelineno-20-76"></a>        for t in range(self.T - 1, -1, -1):
+</span><span id="__span-20-77"><a id="__codelineno-20-77" name="__codelineno-20-77" href="#__codelineno-20-77"></a>            predicted_noise = self.predict_noise(x, t)
+</span><span id="__span-20-78"><a id="__codelineno-20-78" name="__codelineno-20-78" href="#__codelineno-20-78"></a>
+</span><span id="__span-20-79"><a id="__codelineno-20-79" name="__codelineno-20-79" href="#__codelineno-20-79"></a>            alpha = self.alphas[t]
+</span><span id="__span-20-80"><a id="__codelineno-20-80" name="__codelineno-20-80" href="#__codelineno-20-80"></a>            alpha_bar = self.alpha_bars[t]
+</span><span id="__span-20-81"><a id="__codelineno-20-81" name="__codelineno-20-81" href="#__codelineno-20-81"></a>
+</span><span id="__span-20-82"><a id="__codelineno-20-82" name="__codelineno-20-82" href="#__codelineno-20-82"></a>            # Denoising step (DDPM equation)
+</span><span id="__span-20-83"><a id="__codelineno-20-83" name="__codelineno-20-83" href="#__codelineno-20-83"></a>            x = (1 / np.sqrt(alpha)) * (
+</span><span id="__span-20-84"><a id="__codelineno-20-84" name="__codelineno-20-84" href="#__codelineno-20-84"></a>                x - (self.betas[t] / np.sqrt(1 - alpha_bar)) * predicted_noise
+</span><span id="__span-20-85"><a id="__codelineno-20-85" name="__codelineno-20-85" href="#__codelineno-20-85"></a>            )
+</span><span id="__span-20-86"><a id="__codelineno-20-86" name="__codelineno-20-86" href="#__codelineno-20-86"></a>
+</span><span id="__span-20-87"><a id="__codelineno-20-87" name="__codelineno-20-87" href="#__codelineno-20-87"></a>            # Add noise (except at last step)
+</span><span id="__span-20-88"><a id="__codelineno-20-88" name="__codelineno-20-88" href="#__codelineno-20-88"></a>            if t &gt; 0:
+</span><span id="__span-20-89"><a id="__codelineno-20-89" name="__codelineno-20-89" href="#__codelineno-20-89"></a>                noise = np.random.randn(self.data_dim)
+</span><span id="__span-20-90"><a id="__codelineno-20-90" name="__codelineno-20-90" href="#__codelineno-20-90"></a>                x += np.sqrt(self.betas[t]) * noise
+</span><span id="__span-20-91"><a id="__codelineno-20-91" name="__codelineno-20-91" href="#__codelineno-20-91"></a>
+</span><span id="__span-20-92"><a id="__codelineno-20-92" name="__codelineno-20-92" href="#__codelineno-20-92"></a>        return x
+</span><span id="__span-20-93"><a id="__codelineno-20-93" name="__codelineno-20-93" href="#__codelineno-20-93"></a>
+</span><span id="__span-20-94"><a id="__codelineno-20-94" name="__codelineno-20-94" href="#__codelineno-20-94"></a># ============================================================
+</span><span id="__span-20-95"><a id="__codelineno-20-95" name="__codelineno-20-95" href="#__codelineno-20-95"></a># CLIP-STYLE CONTRASTIVE LEARNING
+</span><span id="__span-20-96"><a id="__codelineno-20-96" name="__codelineno-20-96" href="#__codelineno-20-96"></a># ============================================================
+</span><span id="__span-20-97"><a id="__codelineno-20-97" name="__codelineno-20-97" href="#__codelineno-20-97"></a>
+</span><span id="__span-20-98"><a id="__codelineno-20-98" name="__codelineno-20-98" href="#__codelineno-20-98"></a>class SimpleCLIP:
+</span><span id="__span-20-99"><a id="__codelineno-20-99" name="__codelineno-20-99" href="#__codelineno-20-99"></a>    &quot;&quot;&quot;Simplified CLIP to understand contrastive learning.&quot;&quot;&quot;
+</span><span id="__span-20-100"><a id="__codelineno-20-100" name="__codelineno-20-100" href="#__codelineno-20-100"></a>
+</span><span id="__span-20-101"><a id="__codelineno-20-101" name="__codelineno-20-101" href="#__codelineno-20-101"></a>    def __init__(self, image_dim, text_dim, embed_dim):
+</span><span id="__span-20-102"><a id="__codelineno-20-102" name="__codelineno-20-102" href="#__codelineno-20-102"></a>        self.image_proj = np.random.randn(image_dim, embed_dim) * 0.01
+</span><span id="__span-20-103"><a id="__codelineno-20-103" name="__codelineno-20-103" href="#__codelineno-20-103"></a>        self.text_proj = np.random.randn(text_dim, embed_dim) * 0.01
+</span><span id="__span-20-104"><a id="__codelineno-20-104" name="__codelineno-20-104" href="#__codelineno-20-104"></a>        self.temperature = 0.07  # learned in real CLIP
+</span><span id="__span-20-105"><a id="__codelineno-20-105" name="__codelineno-20-105" href="#__codelineno-20-105"></a>
+</span><span id="__span-20-106"><a id="__codelineno-20-106" name="__codelineno-20-106" href="#__codelineno-20-106"></a>    def encode_image(self, images):
+</span><span id="__span-20-107"><a id="__codelineno-20-107" name="__codelineno-20-107" href="#__codelineno-20-107"></a>        &quot;&quot;&quot;Project images to shared embedding space.&quot;&quot;&quot;
+</span><span id="__span-20-108"><a id="__codelineno-20-108" name="__codelineno-20-108" href="#__codelineno-20-108"></a>        embeddings = images @ self.image_proj
+</span><span id="__span-20-109"><a id="__codelineno-20-109" name="__codelineno-20-109" href="#__codelineno-20-109"></a>        # L2 normalize
+</span><span id="__span-20-110"><a id="__codelineno-20-110" name="__codelineno-20-110" href="#__codelineno-20-110"></a>        return embeddings / np.linalg.norm(embeddings, axis=1, keepdims=True)
+</span><span id="__span-20-111"><a id="__codelineno-20-111" name="__codelineno-20-111" href="#__codelineno-20-111"></a>
+</span><span id="__span-20-112"><a id="__codelineno-20-112" name="__codelineno-20-112" href="#__codelineno-20-112"></a>    def encode_text(self, texts):
+</span><span id="__span-20-113"><a id="__codelineno-20-113" name="__codelineno-20-113" href="#__codelineno-20-113"></a>        &quot;&quot;&quot;Project texts to shared embedding space.&quot;&quot;&quot;
+</span><span id="__span-20-114"><a id="__codelineno-20-114" name="__codelineno-20-114" href="#__codelineno-20-114"></a>        embeddings = texts @ self.text_proj
+</span><span id="__span-20-115"><a id="__codelineno-20-115" name="__codelineno-20-115" href="#__codelineno-20-115"></a>        return embeddings / np.linalg.norm(embeddings, axis=1, keepdims=True)
+</span><span id="__span-20-116"><a id="__codelineno-20-116" name="__codelineno-20-116" href="#__codelineno-20-116"></a>
+</span><span id="__span-20-117"><a id="__codelineno-20-117" name="__codelineno-20-117" href="#__codelineno-20-117"></a>    def contrastive_loss(self, images, texts):
+</span><span id="__span-20-118"><a id="__codelineno-20-118" name="__codelineno-20-118" href="#__codelineno-20-118"></a>        &quot;&quot;&quot;InfoNCE loss — the CLIP training objective.&quot;&quot;&quot;
+</span><span id="__span-20-119"><a id="__codelineno-20-119" name="__codelineno-20-119" href="#__codelineno-20-119"></a>        image_embeds = self.encode_image(images)
+</span><span id="__span-20-120"><a id="__codelineno-20-120" name="__codelineno-20-120" href="#__codelineno-20-120"></a>        text_embeds = self.encode_text(texts)
+</span><span id="__span-20-121"><a id="__codelineno-20-121" name="__codelineno-20-121" href="#__codelineno-20-121"></a>
+</span><span id="__span-20-122"><a id="__codelineno-20-122" name="__codelineno-20-122" href="#__codelineno-20-122"></a>        # Similarity matrix (batch × batch)
+</span><span id="__span-20-123"><a id="__codelineno-20-123" name="__codelineno-20-123" href="#__codelineno-20-123"></a>        logits = (image_embeds @ text_embeds.T) / self.temperature
+</span><span id="__span-20-124"><a id="__codelineno-20-124" name="__codelineno-20-124" href="#__codelineno-20-124"></a>
+</span><span id="__span-20-125"><a id="__codelineno-20-125" name="__codelineno-20-125" href="#__codelineno-20-125"></a>        # Labels: diagonal elements are positive pairs
+</span><span id="__span-20-126"><a id="__codelineno-20-126" name="__codelineno-20-126" href="#__codelineno-20-126"></a>        batch_size = len(images)
+</span><span id="__span-20-127"><a id="__codelineno-20-127" name="__codelineno-20-127" href="#__codelineno-20-127"></a>        labels = np.arange(batch_size)
+</span><span id="__span-20-128"><a id="__codelineno-20-128" name="__codelineno-20-128" href="#__codelineno-20-128"></a>
+</span><span id="__span-20-129"><a id="__codelineno-20-129" name="__codelineno-20-129" href="#__codelineno-20-129"></a>        # Symmetric cross-entropy loss
+</span><span id="__span-20-130"><a id="__codelineno-20-130" name="__codelineno-20-130" href="#__codelineno-20-130"></a>        # Image → Text direction
+</span><span id="__span-20-131"><a id="__codelineno-20-131" name="__codelineno-20-131" href="#__codelineno-20-131"></a>        loss_i2t = -np.mean(logits[range(batch_size), labels] -
+</span><span id="__span-20-132"><a id="__codelineno-20-132" name="__codelineno-20-132" href="#__codelineno-20-132"></a>                            np.log(np.sum(np.exp(logits), axis=1)))
+</span><span id="__span-20-133"><a id="__codelineno-20-133" name="__codelineno-20-133" href="#__codelineno-20-133"></a>        # Text → Image direction
+</span><span id="__span-20-134"><a id="__codelineno-20-134" name="__codelineno-20-134" href="#__codelineno-20-134"></a>        loss_t2i = -np.mean(logits.T[range(batch_size), labels] -
+</span><span id="__span-20-135"><a id="__codelineno-20-135" name="__codelineno-20-135" href="#__codelineno-20-135"></a>                            np.log(np.sum(np.exp(logits.T), axis=1)))
+</span><span id="__span-20-136"><a id="__codelineno-20-136" name="__codelineno-20-136" href="#__codelineno-20-136"></a>
+</span><span id="__span-20-137"><a id="__codelineno-20-137" name="__codelineno-20-137" href="#__codelineno-20-137"></a>        return (loss_i2t + loss_t2i) / 2
+</span><span id="__span-20-138"><a id="__codelineno-20-138" name="__codelineno-20-138" href="#__codelineno-20-138"></a>
+</span><span id="__span-20-139"><a id="__codelineno-20-139" name="__codelineno-20-139" href="#__codelineno-20-139"></a>    def zero_shot_classify(self, image, class_texts):
+</span><span id="__span-20-140"><a id="__codelineno-20-140" name="__codelineno-20-140" href="#__codelineno-20-140"></a>        &quot;&quot;&quot;Zero-shot classification using CLIP.&quot;&quot;&quot;
+</span><span id="__span-20-141"><a id="__codelineno-20-141" name="__codelineno-20-141" href="#__codelineno-20-141"></a>        image_embed = self.encode_image(image.reshape(1, -1))
+</span><span id="__span-20-142"><a id="__codelineno-20-142" name="__codelineno-20-142" href="#__codelineno-20-142"></a>        text_embeds = self.encode_text(class_texts)
+</span><span id="__span-20-143"><a id="__codelineno-20-143" name="__codelineno-20-143" href="#__codelineno-20-143"></a>        similarities = (image_embed @ text_embeds.T).flatten()
+</span><span id="__span-20-144"><a id="__codelineno-20-144" name="__codelineno-20-144" href="#__codelineno-20-144"></a>        return np.argmax(similarities)
+</span><span id="__span-20-145"><a id="__codelineno-20-145" name="__codelineno-20-145" href="#__codelineno-20-145"></a>
+</span><span id="__span-20-146"><a id="__codelineno-20-146" name="__codelineno-20-146" href="#__codelineno-20-146"></a># Example
+</span><span id="__span-20-147"><a id="__codelineno-20-147" name="__codelineno-20-147" href="#__codelineno-20-147"></a>diffusion = SimpleDiffusion(data_dim=2, T=50)
+</span><span id="__span-20-148"><a id="__codelineno-20-148" name="__codelineno-20-148" href="#__codelineno-20-148"></a>print(f&quot;Generated sample: {diffusion.sample()}&quot;)
+</span></code></pre></div>
+</details>
+<hr />
+<h2 id="1410-interview-questions">14.10 Interview Questions<a class="headerlink" href="#1410-interview-questions" title="Permanent link">&para;</a></h2>
+<h3 id="conceptual-questions">Conceptual Questions<a class="headerlink" href="#conceptual-questions" title="Permanent link">&para;</a></h3>
+<p><strong>Q1: Explain how diffusion models generate images. What are the forward and reverse processes?</strong></p>
+<p>Forward process: Gradually add Gaussian noise to an image over T steps according to a fixed schedule (<span class="arithmatex">\(\beta_1 &lt; ... &lt; \beta_T\)</span>). At step T, the image is pure noise. This is deterministic and doesn't require training. Reverse process: A neural network (U-Net or DiT) learns to predict the noise added at each step. Starting from pure noise, iteratively predict and remove noise over T steps to generate a clean image. Training loss: MSE between actual noise and predicted noise: <span class="arithmatex">\(L = E[\|\epsilon - \epsilon_\theta(x_t, t)\|^2]\)</span>. Key insight: by learning to denoise at every noise level, the model implicitly learns the data distribution.</p>
+<p><strong>Q2: What is classifier-free guidance (CFG) and why is it important for text-to-image generation?</strong></p>
+<p>CFG trains the diffusion model to work both WITH and WITHOUT text conditioning (randomly dropping the text prompt during training, e.g., 10% of the time). At inference, compute two predictions: <span class="arithmatex">\(\epsilon_\text{cond}\)</span> (with text) and <span class="arithmatex">\(\epsilon_\text{uncond}\)</span> (without text). The final prediction is: <span class="arithmatex">\(\tilde{\epsilon} = \epsilon_\text{uncond} + s(\epsilon_\text{cond} - \epsilon_\text{uncond})\)</span>, where <span class="arithmatex">\(s &gt; 1\)</span> amplifies the text signal. Higher s = stronger prompt adherence but less diversity. Typical values: s = 7-15. This replaced separate classifier guidance, simplifying the pipeline and improving quality.</p>
+<p><strong>Q3: How does CLIP work, and why is it foundational to modern multimodal AI?</strong></p>
+<p>CLIP trains an image encoder and text encoder jointly using contrastive learning on 400M image-text pairs. Goal: matching image-text pairs should have high cosine similarity; non-matching pairs should be low. Uses InfoNCE loss on the similarity matrix (symmetric cross-entropy on the batch×batch similarity matrix). Result: a shared embedding space where text and images are aligned. Foundational because: (1) zero-shot classification (no task-specific training), (2) text conditioning for diffusion models, (3) vision encoder for multimodal LLMs, (4) image-text retrieval, (5) evaluation metric (CLIP Score).</p>
+<p><strong>Q4: Compare GANs and diffusion models. Why have diffusion models largely replaced GANs?</strong></p>
+<p>GANs: faster sampling (single forward pass), but suffer from mode collapse (limited diversity), training instability (adversarial game), and no likelihood computation. Diffusion models: slower sampling (many denoising steps), but offer stable training (simple MSE loss), better diversity (no mode collapse), controllable generation (CFG, ControlNet), and log-likelihood estimation. Diffusion won because: (1) better FID scores at scale, (2) much easier to train, (3) natural support for text conditioning via cross-attention, (4) composability (inpainting, editing, ControlNet). Speed gap is closing with DDIM, consistency models, and distillation (1-4 step generation).</p>
+<p><strong>Q5: Explain the "latent" in Latent Diffusion Models. Why is it important?</strong></p>
+<p>Instead of running diffusion in pixel space (3×512×512 = 786K dimensions), first compress images to a latent space using a pre-trained VAE (4×64×64 = 16K dimensions, a 49×reduction). Diffusion then operates on these compact latents. Benefits: (1) massive compute savings (49× fewer dimensions), (2) VAE removes imperceptible high-frequency details that waste model capacity, (3) enables higher resolution generation, (4) latent space has more semantic structure (nearby latents = similar images). This is what made Stable Diffusion practical to run on consumer GPUs.</p>
+<h3 id="coding-questions">Coding Questions<a class="headerlink" href="#coding-questions" title="Permanent link">&para;</a></h3>
+<p><strong>Q6: Implement the core diffusion sampling loop (DDPM) given a trained noise predictor.</strong></p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-21-1"><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">ddpm_sample</span><span class="p">(</span><span class="n">noise_predictor</span><span class="p">,</span> <span class="n">shape</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span> <span class="n">betas</span><span class="p">):</span>
+</span><span id="__span-21-2"><a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Generate a sample using DDPM reverse process.&quot;&quot;&quot;</span>
+</span><span id="__span-21-3"><a id="__codelineno-21-3" name="__codelineno-21-3" href="#__codelineno-21-3"></a>    <span class="n">alphas</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">betas</span>
+</span><span id="__span-21-4"><a id="__codelineno-21-4" name="__codelineno-21-4" href="#__codelineno-21-4"></a>    <span class="n">alpha_bars</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cumprod</span><span class="p">(</span><span class="n">alphas</span><span class="p">)</span>
+</span><span id="__span-21-5"><a id="__codelineno-21-5" name="__codelineno-21-5" href="#__codelineno-21-5"></a>
+</span><span id="__span-21-6"><a id="__codelineno-21-6" name="__codelineno-21-6" href="#__codelineno-21-6"></a>    <span class="c1"># Start from pure Gaussian noise</span>
+</span><span id="__span-21-7"><a id="__codelineno-21-7" name="__codelineno-21-7" href="#__codelineno-21-7"></a>    <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="o">*</span><span class="n">shape</span><span class="p">)</span>
+</span><span id="__span-21-8"><a id="__codelineno-21-8" name="__codelineno-21-8" href="#__codelineno-21-8"></a>
+</span><span id="__span-21-9"><a id="__codelineno-21-9" name="__codelineno-21-9" href="#__codelineno-21-9"></a>    <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">T</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+</span><span id="__span-21-10"><a id="__codelineno-21-10" name="__codelineno-21-10" href="#__codelineno-21-10"></a>        <span class="c1"># Predict noise</span>
+</span><span id="__span-21-11"><a id="__codelineno-21-11" name="__codelineno-21-11" href="#__codelineno-21-11"></a>        <span class="n">eps_pred</span> <span class="o">=</span> <span class="n">noise_predictor</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span>
+</span><span id="__span-21-12"><a id="__codelineno-21-12" name="__codelineno-21-12" href="#__codelineno-21-12"></a>
+</span><span id="__span-21-13"><a id="__codelineno-21-13" name="__codelineno-21-13" href="#__codelineno-21-13"></a>        <span class="c1"># Compute denoised estimate</span>
+</span><span id="__span-21-14"><a id="__codelineno-21-14" name="__codelineno-21-14" href="#__codelineno-21-14"></a>        <span class="n">coeff1</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">alphas</span><span class="p">[</span><span class="n">t</span><span class="p">])</span>
+</span><span id="__span-21-15"><a id="__codelineno-21-15" name="__codelineno-21-15" href="#__codelineno-21-15"></a>        <span class="n">coeff2</span> <span class="o">=</span> <span class="n">betas</span><span class="p">[</span><span class="n">t</span><span class="p">]</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">alpha_bars</span><span class="p">[</span><span class="n">t</span><span class="p">])</span>
+</span><span id="__span-21-16"><a id="__codelineno-21-16" name="__codelineno-21-16" href="#__codelineno-21-16"></a>
+</span><span id="__span-21-17"><a id="__codelineno-21-17" name="__codelineno-21-17" href="#__codelineno-21-17"></a>        <span class="n">x</span> <span class="o">=</span> <span class="n">coeff1</span> <span class="o">*</span> <span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">coeff2</span> <span class="o">*</span> <span class="n">eps_pred</span><span class="p">)</span>
+</span><span id="__span-21-18"><a id="__codelineno-21-18" name="__codelineno-21-18" href="#__codelineno-21-18"></a>
+</span><span id="__span-21-19"><a id="__codelineno-21-19" name="__codelineno-21-19" href="#__codelineno-21-19"></a>        <span class="c1"># Add noise for all steps except the last</span>
+</span><span id="__span-21-20"><a id="__codelineno-21-20" name="__codelineno-21-20" href="#__codelineno-21-20"></a>        <span class="k">if</span> <span class="n">t</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+</span><span id="__span-21-21"><a id="__codelineno-21-21" name="__codelineno-21-21" href="#__codelineno-21-21"></a>            <span class="n">sigma</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">betas</span><span class="p">[</span><span class="n">t</span><span class="p">])</span>
+</span><span id="__span-21-22"><a id="__codelineno-21-22" name="__codelineno-21-22" href="#__codelineno-21-22"></a>            <span class="n">x</span> <span class="o">+=</span> <span class="n">sigma</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="o">*</span><span class="n">shape</span><span class="p">)</span>
+</span><span id="__span-21-23"><a id="__codelineno-21-23" name="__codelineno-21-23" href="#__codelineno-21-23"></a>
+</span><span id="__span-21-24"><a id="__codelineno-21-24" name="__codelineno-21-24" href="#__codelineno-21-24"></a>    <span class="k">return</span> <span class="n">x</span>
+</span></code></pre></div>
+<h3 id="system-design-questions">System Design Questions<a class="headerlink" href="#system-design-questions" title="Permanent link">&para;</a></h3>
+<p><strong>Q7: Design a text-to-image generation service that handles 100 requests per second with &lt;5 second latency.</strong></p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-22-1"><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a>┌──────────────────────────────────────────────────────────────────┐
+</span><span id="__span-22-2"><a id="__codelineno-22-2" name="__codelineno-22-2" href="#__codelineno-22-2"></a>│           Text-to-Image Service Architecture                      │
+</span><span id="__span-22-3"><a id="__codelineno-22-3" name="__codelineno-22-3" href="#__codelineno-22-3"></a>├──────────────────────────────────────────────────────────────────┤
+</span><span id="__span-22-4"><a id="__codelineno-22-4" name="__codelineno-22-4" href="#__codelineno-22-4"></a>│                                                                   │
+</span><span id="__span-22-5"><a id="__codelineno-22-5" name="__codelineno-22-5" href="#__codelineno-22-5"></a>│  1. API LAYER                                                     │
+</span><span id="__span-22-6"><a id="__codelineno-22-6" name="__codelineno-22-6" href="#__codelineno-22-6"></a>│     REST/WebSocket API, rate limiting per user                    │
+</span><span id="__span-22-7"><a id="__codelineno-22-7" name="__codelineno-22-7" href="#__codelineno-22-7"></a>│     Prompt safety filter (block NSFW/harmful prompts)             │
+</span><span id="__span-22-8"><a id="__codelineno-22-8" name="__codelineno-22-8" href="#__codelineno-22-8"></a>│     Queue: Redis priority queue (paid users first)                │
+</span><span id="__span-22-9"><a id="__codelineno-22-9" name="__codelineno-22-9" href="#__codelineno-22-9"></a>│                                                                   │
+</span><span id="__span-22-10"><a id="__codelineno-22-10" name="__codelineno-22-10" href="#__codelineno-22-10"></a>│  2. PROMPT PROCESSING                                             │
+</span><span id="__span-22-11"><a id="__codelineno-22-11" name="__codelineno-22-11" href="#__codelineno-22-11"></a>│     Prompt expansion (LLM rewrites for quality, like DALL-E 3)   │
+</span><span id="__span-22-12"><a id="__codelineno-22-12" name="__codelineno-22-12" href="#__codelineno-22-12"></a>│     Negative prompt injection (common quality improvements)       │
+</span><span id="__span-22-13"><a id="__codelineno-22-13" name="__codelineno-22-13" href="#__codelineno-22-13"></a>│     Language detection + translation to English if needed         │
+</span><span id="__span-22-14"><a id="__codelineno-22-14" name="__codelineno-22-14" href="#__codelineno-22-14"></a>│                                                                   │
+</span><span id="__span-22-15"><a id="__codelineno-22-15" name="__codelineno-22-15" href="#__codelineno-22-15"></a>│  3. GENERATION CLUSTER                                            │
+</span><span id="__span-22-16"><a id="__codelineno-22-16" name="__codelineno-22-16" href="#__codelineno-22-16"></a>│     GPU pool: 20-40 A100/H100 GPUs                                │
+</span><span id="__span-22-17"><a id="__codelineno-22-17" name="__codelineno-22-17" href="#__codelineno-22-17"></a>│     Model: SDXL/Flux with LoRA adapters for styles               │
+</span><span id="__span-22-18"><a id="__codelineno-22-18" name="__codelineno-22-18" href="#__codelineno-22-18"></a>│     Optimization: TensorRT, fp16, 20-step DDIM (not 50 DDPM)    │
+</span><span id="__span-22-19"><a id="__codelineno-22-19" name="__codelineno-22-19" href="#__codelineno-22-19"></a>│     Batch: accumulate requests, batch-generate (4-8 per batch)   │
+</span><span id="__span-22-20"><a id="__codelineno-22-20" name="__codelineno-22-20" href="#__codelineno-22-20"></a>│     Target: ~2s per image on A100 with optimizations              │
+</span><span id="__span-22-21"><a id="__codelineno-22-21" name="__codelineno-22-21" href="#__codelineno-22-21"></a>│                                                                   │
+</span><span id="__span-22-22"><a id="__codelineno-22-22" name="__codelineno-22-22" href="#__codelineno-22-22"></a>│  4. POST-PROCESSING                                               │
+</span><span id="__span-22-23"><a id="__codelineno-22-23" name="__codelineno-22-23" href="#__codelineno-22-23"></a>│     NSFW classifier on output (filter unsafe generations)         │
+</span><span id="__span-22-24"><a id="__codelineno-22-24" name="__codelineno-22-24" href="#__codelineno-22-24"></a>│     Upscaling: Real-ESRGAN for 4× resolution boost               │
+</span><span id="__span-22-25"><a id="__codelineno-22-25" name="__codelineno-22-25" href="#__codelineno-22-25"></a>│     Watermarking: invisible watermark in generated images         │
+</span><span id="__span-22-26"><a id="__codelineno-22-26" name="__codelineno-22-26" href="#__codelineno-22-26"></a>│     CDN upload: S3/CloudFront for fast delivery                   │
+</span><span id="__span-22-27"><a id="__codelineno-22-27" name="__codelineno-22-27" href="#__codelineno-22-27"></a>│                                                                   │
+</span><span id="__span-22-28"><a id="__codelineno-22-28" name="__codelineno-22-28" href="#__codelineno-22-28"></a>│  5. CACHING &amp; OPTIMIZATION                                        │
+</span><span id="__span-22-29"><a id="__codelineno-22-29" name="__codelineno-22-29" href="#__codelineno-22-29"></a>│     Semantic prompt cache: similar prompts → cached results       │
+</span><span id="__span-22-30"><a id="__codelineno-22-30" name="__codelineno-22-30" href="#__codelineno-22-30"></a>│     Popular styles pre-generated (daily trending)                  │
+</span><span id="__span-22-31"><a id="__codelineno-22-31" name="__codelineno-22-31" href="#__codelineno-22-31"></a>│     Prompt embedding cache (avoid re-encoding CLIP)               │
+</span><span id="__span-22-32"><a id="__codelineno-22-32" name="__codelineno-22-32" href="#__codelineno-22-32"></a>│                                                                   │
+</span><span id="__span-22-33"><a id="__codelineno-22-33" name="__codelineno-22-33" href="#__codelineno-22-33"></a>│  6. COST OPTIMIZATION                                             │
+</span><span id="__span-22-34"><a id="__codelineno-22-34" name="__codelineno-22-34" href="#__codelineno-22-34"></a>│     Spot/preemptible GPUs for non-urgent requests                │
+</span><span id="__span-22-35"><a id="__codelineno-22-35" name="__codelineno-22-35" href="#__codelineno-22-35"></a>│     Model distillation: 4-step consistency model for drafts      │
+</span><span id="__span-22-36"><a id="__codelineno-22-36" name="__codelineno-22-36" href="#__codelineno-22-36"></a>│     Tiered quality: fast/draft (4 steps) vs high (20 steps)      │
+</span><span id="__span-22-37"><a id="__codelineno-22-37" name="__codelineno-22-37" href="#__codelineno-22-37"></a>│     ~$0.02-0.04 per image at scale                                │
+</span><span id="__span-22-38"><a id="__codelineno-22-38" name="__codelineno-22-38" href="#__codelineno-22-38"></a>│                                                                   │
+</span><span id="__span-22-39"><a id="__codelineno-22-39" name="__codelineno-22-39" href="#__codelineno-22-39"></a>└──────────────────────────────────────────────────────────────────┘
+</span></code></pre></div>
+<hr />
+<h2 id="1411-key-papers">14.11 Key Papers<a class="headerlink" href="#1411-key-papers" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Paper</th>
+<th>Year</th>
+<th>Why It Matters</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><em>Denoising Diffusion Probabilistic Models</em> (Ho et al.)</td>
+<td>2020</td>
+<td>DDPM — modern diffusion models</td>
+</tr>
+<tr>
+<td><em>High-Resolution Image Synthesis with Latent Diffusion</em> (Rombach et al.)</td>
+<td>2022</td>
+<td>Stable Diffusion — latent space diffusion</td>
+</tr>
+<tr>
+<td><em>Learning Transferable Visual Models from NL Supervision</em> (Radford et al.)</td>
+<td>2021</td>
+<td>CLIP — connected vision and language</td>
+</tr>
+<tr>
+<td><em>Scalable Diffusion Models with Transformers</em> (Peebles &amp; Xie)</td>
+<td>2023</td>
+<td>DiT — transformers replace U-Net</td>
+</tr>
+<tr>
+<td><em>Classifier-Free Diffusion Guidance</em> (Ho &amp; Salimans)</td>
+<td>2022</td>
+<td>CFG — the key to text-guided generation</td>
+</tr>
+<tr>
+<td><em>Adding Conditional Control to Text-to-Image Diffusion</em> (Zhang et al.)</td>
+<td>2023</td>
+<td>ControlNet — spatial control over generation</td>
+</tr>
+<tr>
+<td><em>Denoising Diffusion Implicit Models</em> (Song et al.)</td>
+<td>2020</td>
+<td>DDIM — faster sampling (10-50× speedup)</td>
+</tr>
+<tr>
+<td><em>Video Generation Models as World Simulators</em> (OpenAI)</td>
+<td>2024</td>
+<td>Sora technical report — video DiT</td>
+</tr>
+<tr>
+<td><em>Robust Speech Recognition via Large-Scale Weak Supervision</em> (Radford et al.)</td>
+<td>2022</td>
+<td>Whisper — universal speech recognition</td>
+</tr>
+<tr>
+<td><em>Neural Codec Language Models are Zero-Shot Text to Speech Synthesizers</em> (Wang et al.)</td>
+<td>2023</td>
+<td>VALL-E — LLM approach to speech synthesis</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<p><a href="../module-13-deep-learning/">← Module 13: Deep Learning</a> | <a href="../module-15-mlops/">Module 15: MLOps →</a></p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="../module-10-advanced/" class="md-footer__link md-footer__link--prev" aria-label="Previous: 10 — Advanced Topics">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                10 — Advanced Topics
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../module-15-mlops/" class="md-footer__link md-footer__link--next" aria-label="Next: 15 — MLOps &amp; Production ML">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                15 — MLOps & Production ML
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.tabs", "navigation.sections", "navigation.expand", "navigation.top", "navigation.footer", "search.suggest", "search.highlight", "content.code.copy", "content.tabs.link", "toc.follow"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+        <script src="https://unpkg.com/mermaid@10/dist/mermaid.min.js"></script>
+      
+        <script src="https://unpkg.com/katex@0.16.10/dist/katex.min.js"></script>
+      
+        <script src="https://unpkg.com/katex@0.16.10/dist/contrib/auto-render.min.js"></script>
+      
+    
+  </body>
+</html>
