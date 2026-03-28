@@ -47,7 +47,11 @@ plugins:
 markdown_extensions:
   - admonition
   - pymdownx.details
-  - pymdownx.superfences
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
   - pymdownx.highlight:
       anchor_linenums: true
       line_spans: __span
@@ -71,6 +75,7 @@ markdown_extensions:
       custom_checkbox: true
 
 extra_javascript:
+  - https://unpkg.com/mermaid@10/dist/mermaid.min.js
   - https://unpkg.com/katex@0.16.10/dist/katex.min.js
   - https://unpkg.com/katex@0.16.10/dist/contrib/auto-render.min.js
 

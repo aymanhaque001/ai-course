@@ -339,42 +339,46 @@ CLIP Training (Contrastive Language-Image Pre-training):
 ### ControlNet Architecture — Zero Convolutions
 
 ```
+
 How ControlNet injects spatial control without breaking the base model:
 
-  Original U-Net encoder (FROZEN — weights never change)
-       │                         ┌── skip connections ──┐
-       │  exact copy             │                      │
-       ▼  (trainable)            │                      ▼
-  ControlNet encoder copy  ──zero conv──▶  U-Net decoder
-       │
-       ▲
-  Control signal (edge map, depth map, pose skeleton, ...)
+Original U-Net encoder (FROZEN — weights never change)
+│ ┌── skip connections ──┐
+│ exact copy │ │
+▼ (trainable) │ ▼
+ControlNet encoder copy ──zero conv──▶ U-Net decoder
+│
+▲
+Control signal (edge map, depth map, pose skeleton, ...)
 
-  "Zero convolutions" = 1×1 convolutions initialized with weights=0, bias=0
+"Zero convolutions" = 1×1 convolutions initialized with weights=0, bias=0
 
-  Why zero initialization matters:
-    At training step 0: zero conv outputs 0 → adds nothing to the U-Net
-    → ControlNet starts with ZERO effect on the frozen model
-    → No risk of corrupting the pre-trained weights on first steps
-    → Gradually learns to inject spatial guidance as weights grow from zero
+Why zero initialization matters:
+At training step 0: zero conv outputs 0 → adds nothing to the U-Net
+→ ControlNet starts with ZERO effect on the frozen model
+→ No risk of corrupting the pre-trained weights on first steps
+→ Gradually learns to inject spatial guidance as weights grow from zero
 
-  Training: freeze original U-Net, train only the copy + zero convs
-  Add control signal outputs to the original U-Net's skip connections
-  Result: spatial structure (pose, edges) preserved while text controls style
+Training: freeze original U-Net, train only the copy + zero convs
+Add control signal outputs to the original U-Net's skip connections
+Result: spatial structure (pose, edges) preserved while text controls style
+
 ```
 
 ```
+
 ┌──────────────┬──────────────────────────────────────────────────┐
-│ IP-Adapter   │ Image prompt adapter — use a reference image     │
-│              │ as a style/content guide                          │
+│ IP-Adapter │ Image prompt adapter — use a reference image │
+│ │ as a style/content guide │
 ├──────────────┼──────────────────────────────────────────────────┤
-│ LoRA for     │ Fine-tune diffusion model with ~100 images       │
-│ Diffusion    │ of a specific style/character/concept            │
-│              │ Same low-rank adaptation as for LLMs!            │
+│ LoRA for │ Fine-tune diffusion model with ~100 images │
+│ Diffusion │ of a specific style/character/concept │
+│ │ Same low-rank adaptation as for LLMs! │
 ├──────────────┼──────────────────────────────────────────────────┤
-│ Textual      │ Learn a new "word" embedding for a concept       │
-│ Inversion    │ from few images — <<my_style>> in prompts        │
+│ Textual │ Learn a new "word" embedding for a concept │
+│ Inversion │ from few images — <<my_style>> in prompts │
 └──────────────┴──────────────────────────────────────────────────┘
+
 ```
 
 ---
@@ -382,42 +386,45 @@ How ControlNet injects spatial control without breaking the base model:
 ## 14.5 Video Generation
 
 ```
+
 Video = Image sequence with temporal consistency
 
 Challenges:
-  1. Temporal coherence (objects don't flicker/teleport)
-  2. Compute cost (3D data: height × width × time × channels)
-  3. Motion understanding (physics, gravity, dynamics)
-  4. Long-range consistency (beginning matches end)
+
+1. Temporal coherence (objects don't flicker/teleport)
+2. Compute cost (3D data: height × width × time × channels)
+3. Motion understanding (physics, gravity, dynamics)
+4. Long-range consistency (beginning matches end)
 
 Architecture Approaches:
 
-  ┌──────────────────────────────────────────────────────────┐
-  │  Sora (OpenAI, 2024):                                    │
-  │                                                           │
-  │  Video → "spacetime patches" (3D tokens)                  │
-  │  Diffusion Transformer in latent space                    │
-  │  Can generate variable resolution/aspect ratio/duration   │
-  │  Trained on massive video + image data                    │
-  │                                                           │
-  │  3D Patch Tokenization:                                   │
-  │  ┌────┬────┐  ┌────┬────┐  ┌────┬────┐                  │
-  │  │ P1 │ P2 │  │ P5 │ P6 │  │ P9 │P10 │                  │
-  │  ├────┼────┤  ├────┼────┤  ├────┼────┤                  │
-  │  │ P3 │ P4 │  │ P7 │ P8 │  │P11 │P12 │                  │
-  │  └────┴────┘  └────┴────┘  └────┴────┘                  │
-  │   Frame 1      Frame 2      Frame 3                      │
-  │                                                           │
-  │  Each patch spans space AND time                          │
-  │  → Temporal attention built into transformer              │
-  └──────────────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────────┐
+│ Sora (OpenAI, 2024): │
+│ │
+│ Video → "spacetime patches" (3D tokens) │
+│ Diffusion Transformer in latent space │
+│ Can generate variable resolution/aspect ratio/duration │
+│ Trained on massive video + image data │
+│ │
+│ 3D Patch Tokenization: │
+│ ┌────┬────┐ ┌────┬────┐ ┌────┬────┐ │
+│ │ P1 │ P2 │ │ P5 │ P6 │ │ P9 │P10 │ │
+│ ├────┼────┤ ├────┼────┤ ├────┼────┤ │
+│ │ P3 │ P4 │ │ P7 │ P8 │ │P11 │P12 │ │
+│ └────┴────┘ └────┴────┘ └────┴────┘ │
+│ Frame 1 Frame 2 Frame 3 │
+│ │
+│ Each patch spans space AND time │
+│ → Temporal attention built into transformer │
+└──────────────────────────────────────────────────────────┘
 
 Key Models (2024-2026):
-  Sora:       Up to 1 minute, photorealistic
-  Veo 2:      Google, 4K resolution, good physics
-  Runway Gen-3: Commercial, fast iteration
-  Kling:      Kuaishou, long video generation
-  Wan:        Open source video generation
+Sora: Up to 1 minute, photorealistic
+Veo 2: Google, 4K resolution, good physics
+Runway Gen-3: Commercial, fast iteration
+Kling: Kuaishou, long video generation
+Wan: Open source video generation
+
 ```
 
 ---
@@ -427,51 +434,54 @@ Key Models (2024-2026):
 ### Speech-to-Text (Whisper)
 
 ```
+
 Whisper Architecture (OpenAI):
 
-  Audio (mel spectrogram)
-    │
-    ▼
-  ┌──────────────────┐        ┌──────────────────┐
-  │  Audio Encoder   │───────▶│  Text Decoder    │
-  │  (Transformer)   │ cross  │  (Transformer)   │
-  │                  │ attn   │                  │
-  │  Log-mel spec    │        │  Autoregressive   │
-  │  → 2D conv       │        │  text generation  │
-  │  → transformer   │        │                  │
-  └──────────────────┘        └──────────────────┘
-                                       │
-                                       ▼
-                              "Hello, how are you?"
+Audio (mel spectrogram)
+│
+▼
+┌──────────────────┐ ┌──────────────────┐
+│ Audio Encoder │───────▶│ Text Decoder │
+│ (Transformer) │ cross │ (Transformer) │
+│ │ attn │ │
+│ Log-mel spec │ │ Autoregressive │
+│ → 2D conv │ │ text generation │
+│ → transformer │ │ │
+└──────────────────┘ └──────────────────┘
+│
+▼
+"Hello, how are you?"
 
 Key features:
-  - Encoder-decoder (like T5, not like GPT)
-  - Trained on 680K hours of labeled audio
-  - Multilingual (100+ languages)
-  - Handles accents, noise, varied audio quality
-  - Can translate speech directly (any language → English)
 
-  Special tokens: <|startoftranscript|>, <|en|>, <|transcribe|>
-  Multi-task: transcribe, translate, timestamp, language detect
+- Encoder-decoder (like T5, not like GPT)
+- Trained on 680K hours of labeled audio
+- Multilingual (100+ languages)
+- Handles accents, noise, varied audio quality
+- Can translate speech directly (any language → English)
+
+Special tokens: <|startoftranscript|>, <|en|>, <|transcribe|>
+Multi-task: transcribe, translate, timestamp, language detect
+
 ```
 
 ### Text-to-Speech (TTS)
 
 ```
+
 Modern TTS Pipeline:
 
-  Text → [Text Encoder] → [Duration/Acoustic Model] → [Vocoder] → Audio
+Text → [Text Encoder] → [Duration/Acoustic Model] → [Vocoder] → Audio
 
-  Evolution:
-    Concatenative (2000s):  Stitch pre-recorded clips
-    Tacotron 2 (2017):      Seq2seq → mel spectrogram → WaveNet
-    VITS (2021):            End-to-end, real-time, VAE + flow
-    VALL-E (2023):          Neural codec language model
-                            "GPT for speech" — 3 second voice clone!
+Evolution:
+Concatenative (2000s): Stitch pre-recorded clips
+Tacotron 2 (2017): Seq2seq → mel spectrogram → WaveNet
+VITS (2021): End-to-end, real-time, VAE + flow
+VALL-E (2023): Neural codec language model
+"GPT for speech" — 3 second voice clone!
 
-  VALL-E Architecture:
-    1. Audio → Neural audio codec → Discrete tokens
-       (like tokenizing text, but for audio)
+VALL-E Architecture: 1. Audio → Neural audio codec → Discrete tokens
+(like tokenizing text, but for audio)
 
     The codec uses Residual Vector Quantization (RVQ):
 
@@ -500,25 +510,28 @@ Modern TTS Pipeline:
     3. Audio tokens → codec decoder → waveform
 
     This is fundamentally an LLM-style approach applied to audio.
+
 ```
 
 ### Music Generation
 
 ```
+
 MusicGen (Meta, 2023):
-  Text/melody → music
-  Architecture: Transformer LM over audio tokens
-  Encodec audio codec → discrete tokens → autoregressive generation
+Text/melody → music
+Architecture: Transformer LM over audio tokens
+Encodec audio codec → discrete tokens → autoregressive generation
 
 Suno / Udio (2024):
-  Text → complete songs with vocals
-  End-to-end, commercial quality
-  Combine music generation + vocal synthesis
+Text → complete songs with vocals
+End-to-end, commercial quality
+Combine music generation + vocal synthesis
 
 Key insight:
-  The same autoregressive transformer paradigm works for
-  text, code, images (DALL-E 1), audio, and music!
-  → "Everything is a sequence of tokens"
+The same autoregressive transformer paradigm works for
+text, code, images (DALL-E 1), audio, and music!
+→ "Everything is a sequence of tokens"
+
 ```
 
 ---
@@ -526,22 +539,23 @@ Key insight:
 ## 14.7 3D Generation & Beyond
 
 ```
+
 3D Generation Approaches:
 
-  Text → 3D:
-    Point-E (OpenAI):      Text → point cloud → mesh
-    Shap-E (OpenAI):       Text → implicit 3D representation
-    DreamFusion (2022):    Optimize NeRF using 2D diffusion prior
+Text → 3D:
+Point-E (OpenAI): Text → point cloud → mesh
+Shap-E (OpenAI): Text → implicit 3D representation
+DreamFusion (2022): Optimize NeRF using 2D diffusion prior
 
-  Image → 3D:
-    Zero-1-to-3:           Single image → 3D object
-    Gaussian Splatting:     Fast 3D from multi-view images
+Image → 3D:
+Zero-1-to-3: Single image → 3D object
+Gaussian Splatting: Fast 3D from multi-view images
 
-  NeRF (Neural Radiance Fields):
-    Input: multiple photos of a scene
-    Output: 3D representation (render from any angle)
-    Learn: F(x, y, z, θ, φ) → (r, g, b, σ)
-           3D position + viewing direction → color + volume density
+NeRF (Neural Radiance Fields):
+Input: multiple photos of a scene
+Output: 3D representation (render from any angle)
+Learn: F(x, y, z, θ, φ) → (r, g, b, σ)
+3D position + viewing direction → color + volume density
 
     Volume Rendering Equation:
       Cast a ray r(t) = o + td per pixel through the scene
@@ -562,11 +576,12 @@ Key insight:
         Critical for capturing high-frequency detail (sharp edges, fine texture)
         Without it, networks converge to blurry low-frequency functions
 
-  3D Gaussian Splatting (2023):
-    Faster than NeRF (real-time rendering!)
-    Represent scene as millions of 3D gaussians
-    Each gaussian: position, covariance, color, opacity
-    Differentiable rasterization for training
+3D Gaussian Splatting (2023):
+Faster than NeRF (real-time rendering!)
+Represent scene as millions of 3D gaussians
+Each gaussian: position, covariance, color, opacity
+Differentiable rasterization for training
+
 ```
 
 ---
@@ -576,70 +591,72 @@ Key insight:
 ### Latent Spaces
 
 ```
+
 Every generative model operates in a latent space:
 
-  VAE:        Image → encoder → z (continuous, regularized) → decoder → image
-  GAN:        z (random) → generator → image
-  Diffusion:  Image → VAE → latent → noise/denoise → VAE → image
-  LLM:        Token → embedding → hidden states → output distribution
+VAE: Image → encoder → z (continuous, regularized) → decoder → image
+GAN: z (random) → generator → image
+Diffusion: Image → VAE → latent → noise/denoise → VAE → image
+LLM: Token → embedding → hidden states → output distribution
 
-  Why latent spaces matter:
-    - Compression: operate in lower dimensions (cheaper!)
-    - Interpolation: smooth transitions between concepts
-    - Disentanglement: separate factors of variation
-    - Composition: combine concepts (style + content)
+Why latent spaces matter: - Compression: operate in lower dimensions (cheaper!) - Interpolation: smooth transitions between concepts - Disentanglement: separate factors of variation - Composition: combine concepts (style + content)
 
-  Latent interpolation:
+Latent interpolation:
 
-  z_cat ──── z_blend₁ ──── z_blend₂ ──── z_dog
-   🐱          🐱🐕          🐕🐱          🐕
+z_cat ──── z_blend₁ ──── z_blend₂ ──── z_dog
+🐱 🐱🐕 🐕🐱 🐕
 
-  Smooth transition in latent space → smooth transition in output
+Smooth transition in latent space → smooth transition in output
+
 ```
 
 ### The Tokenization Pattern
 
 ```
+
 Unifying principle: EVERYTHING can be tokenized
 
-  Text:    Words/subwords → token IDs → embeddings
-  Images:  Patches (ViT) or VAE latents → continuous/discrete tokens
-  Audio:   Mel spectrogram → codec tokens (EnCodec, SoundStream)
-  Video:   Spacetime patches → tokens
-  3D:      Point clouds or voxels → tokens
-  Music:   Audio codec tokens (same as speech)
-  Code:    Same as text (subword tokenization)
-  Actions: Discretized continuous actions → tokens (RT-2)
+Text: Words/subwords → token IDs → embeddings
+Images: Patches (ViT) or VAE latents → continuous/discrete tokens
+Audio: Mel spectrogram → codec tokens (EnCodec, SoundStream)
+Video: Spacetime patches → tokens
+3D: Point clouds or voxels → tokens
+Music: Audio codec tokens (same as speech)
+Code: Same as text (subword tokenization)
+Actions: Discretized continuous actions → tokens (RT-2)
 
-  → Once tokenized, the SAME transformer architecture works!
-  → This is why LLM techniques (attention, scaling, RLHF) transfer
+→ Once tokenized, the SAME transformer architecture works!
+→ This is why LLM techniques (attention, scaling, RLHF) transfer
+
 ```
 
 ### Evaluation Metrics for Generative Models
 
 ```
+
 ┌──────────────┬──────────────────────────────────────────────────┐
-│ FID (Fréchet │ Compare statistics of generated vs real images    │
-│ Inception    │ Lower = more realistic                           │
-│ Distance)    │ Standard metric for image generation             │
+│ FID (Fréchet │ Compare statistics of generated vs real images │
+│ Inception │ Lower = more realistic │
+│ Distance) │ Standard metric for image generation │
 ├──────────────┼──────────────────────────────────────────────────┤
-│ CLIP Score   │ Cosine similarity between generated image and    │
-│              │ text prompt in CLIP space                        │
-│              │ Higher = better text-image alignment             │
+│ CLIP Score │ Cosine similarity between generated image and │
+│ │ text prompt in CLIP space │
+│ │ Higher = better text-image alignment │
 ├──────────────┼──────────────────────────────────────────────────┤
-│ Inception    │ Quality (KL divergence of class predictions)     │
-│ Score (IS)   │ Higher = more realistic AND diverse              │
+│ Inception │ Quality (KL divergence of class predictions) │
+│ Score (IS) │ Higher = more realistic AND diverse │
 ├──────────────┼──────────────────────────────────────────────────┤
-│ LPIPS        │ Perceptual similarity using deep features        │
-│              │ Lower = more perceptually similar                │
+│ LPIPS │ Perceptual similarity using deep features │
+│ │ Lower = more perceptually similar │
 ├──────────────┼──────────────────────────────────────────────────┤
-│ Human Eval   │ Still the gold standard — Elo ratings from       │
-│              │ pairwise human preferences (like Chatbot Arena)  │
+│ Human Eval │ Still the gold standard — Elo ratings from │
+│ │ pairwise human preferences (like Chatbot Arena) │
 ├──────────────┼──────────────────────────────────────────────────┤
-│ WER (audio)  │ Word Error Rate for speech recognition           │
-│              │ Lower = better transcription                     │
+│ WER (audio) │ Word Error Rate for speech recognition │
+│ │ Lower = better transcription │
 └──────────────┴──────────────────────────────────────────────────┘
-```
+
+````
 
 ---
 
@@ -789,7 +806,7 @@ class SimpleCLIP:
 # Example
 diffusion = SimpleDiffusion(data_dim=2, T=50)
 print(f"Generated sample: {diffusion.sample()}")
-```
+````
 
 </details>
 

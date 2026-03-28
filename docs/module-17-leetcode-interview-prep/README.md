@@ -9,19 +9,19 @@
 
 AI engineer roles at top companies test the **same DSA fundamentals** as software engineering roles, but with additional nuance:
 
-```
-Interview Structure (typical 5-6 rounds):
-┌────────────────────────────────────────────────────────────┐
-│  Round 1: Coding Screen (LeetCode Medium, 45 min)          │
-│  Round 2: Coding On-site #1 (1-2 problems, 45-60 min)     │
-│  Round 3: Coding On-site #2 (1-2 problems, 45-60 min)     │
-│  Round 4: ML/AI Concepts (see Module 16 for systems)       │
-│  Round 5: ML Coding (implement from scratch, 60 min)       │
-│  Round 6: Behavioral / Leadership (STAR format)            │
-└────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    R1["Round 1 — Coding Screen\nLeetCode Medium · 45 min"]
+    R2["Round 2 — Coding On-site #1\n1–2 problems · 45–60 min"]
+    R3["Round 3 — Coding On-site #2\n1–2 problems · 45–60 min"]
+    R4["Round 4 — ML / AI Concepts\nsee Module 16 for systems"]
+    R5["Round 5 — ML Coding\nimplement from scratch · 60 min"]
+    R6["Round 6 — Behavioral / Leadership\nSTAR format"]
+    R1 --> R2 --> R3 --> R4 --> R5 --> R6
 ```
 
 **Key differences vs. SWE interviews:**
+
 - Python is strongly preferred (know it deeply)
 - NumPy/matrix operation questions appear at ML-focused companies
 - Graph problems appear frequently (neural nets ARE computation graphs)
@@ -33,29 +33,31 @@ Interview Structure (typical 5-6 rounds):
 
 Rather than grinding 400 random problems, learn these 14 patterns. Every LeetCode problem maps to one or more of them.
 
-```
-Pattern Map:
-                    ┌─────────────────────────────┐
-                    │     INPUT TYPE               │
-                    └─────────┬───────────────────┘
-                              │
-          ┌───────────────────┼────────────────────┐
-          ▼                   ▼                    ▼
-       ARRAY             STRING/SEQUENCE          GRAPH/TREE
-          │                   │                    │
-    ┌─────┴────┐         ┌────┴───┐          ┌────┴────┐
-    │Two Ptr   │         │Sliding │          │BFS/DFS  │
-    │Binary Srh│         │Window  │          │Topo Sort│
-    │Prefix Sum│         │Hashing │          │Union Fnd│
-    │Intervals │         │Two Ptr │          │Dijkstra │
-    └──────────┘         └────────┘          └─────────┘
-          │
-    ┌─────┴────┐
-    │ SUBPROB  │
-    │DP (1D/2D)│
-    │Backtrack │
-    │Greedy    │
-    └──────────┘
+```mermaid
+flowchart TD
+    I([Input Type])
+    I --> A[Array]
+    I --> S[String / Sequence]
+    I --> G[Graph / Tree]
+
+    A --> TP[Two Pointers]
+    A --> BS[Binary Search]
+    A --> PS[Prefix Sum]
+    A --> IV[Intervals]
+    A --> SUB[Subproblem]
+
+    S --> SW[Sliding Window]
+    S --> SH[Hashing]
+    S --> ST[Two Pointers]
+
+    G --> BFS[BFS / DFS]
+    G --> TS[Topo Sort]
+    G --> UF[Union-Find]
+    G --> DJ[Dijkstra]
+
+    SUB --> DP[DP — 1D / 2D]
+    SUB --> BT[Backtracking]
+    SUB --> GR[Greedy]
 ```
 
 ---
@@ -65,6 +67,7 @@ Pattern Map:
 **Core idea:** Use a hash map to reduce O(n²) lookups to O(1). The most common pattern in interviews.
 
 **Template:**
+
 ```python
 def two_sum(nums: list[int], target: int) -> list[int]:
     seen = {}  # val → index
@@ -78,14 +81,14 @@ def two_sum(nums: list[int], target: int) -> list[int]:
 
 ### Key Problems
 
-| # | Problem | Difficulty | Pattern | Companies |
-|---|---------|-----------|---------|-----------|
-| 1 | Two Sum | Easy | HashMap | Everywhere |
-| 2 | Group Anagrams | Medium | Sort+HashMap | Google, Facebook |
-| 3 | Top K Frequent Elements | Medium | HashMap+Bucket | Amazon, Google |
-| 4 | Product of Array Except Self | Medium | Prefix/Suffix | Facebook, Amazon |
-| 5 | Valid Sudoku | Medium | HashSet | Apple |
-| 6 | Longest Consecutive Sequence | Medium | HashSet | Google |
+| #   | Problem                      | Difficulty | Pattern        | Companies        |
+| --- | ---------------------------- | ---------- | -------------- | ---------------- |
+| 1   | Two Sum                      | Easy       | HashMap        | Everywhere       |
+| 2   | Group Anagrams               | Medium     | Sort+HashMap   | Google, Facebook |
+| 3   | Top K Frequent Elements      | Medium     | HashMap+Bucket | Amazon, Google   |
+| 4   | Product of Array Except Self | Medium     | Prefix/Suffix  | Facebook, Amazon |
+| 5   | Valid Sudoku                 | Medium     | HashSet        | Apple            |
+| 6   | Longest Consecutive Sequence | Medium     | HashSet        | Google           |
 
 ### Deep Dive: Product of Array Except Self
 
@@ -112,7 +115,7 @@ def product_except_self(nums: list[int]) -> list[int]:
 # Time: O(n), Space: O(1) excluding output
 ```
 
-**Reasoning pattern:** "I need product of everything *except* index i. Split into what's to the left and what's to the right. Compute each independently in a single pass."
+**Reasoning pattern:** "I need product of everything _except_ index i. Split into what's to the left and what's to the right. Compute each independently in a single pass."
 
 ---
 
@@ -121,6 +124,7 @@ def product_except_self(nums: list[int]) -> list[int]:
 **Core idea:** Use two indices moving toward each other (or same direction) to eliminate nested loops. Requires sorted input or a clear ordering invariant.
 
 **Template:**
+
 ```python
 def two_sum_sorted(nums: list[int], target: int) -> list[int]:
     left, right = 0, len(nums) - 1
@@ -137,13 +141,13 @@ def two_sum_sorted(nums: list[int], target: int) -> list[int]:
 
 ### Key Problems
 
-| # | Problem | Difficulty | Notes |
-|---|---------|-----------|-------|
-| 1 | Valid Palindrome | Easy | Classic left/right |
-| 2 | Two Sum II (Sorted) | Medium | Left/right pointing |
-| 3 | 3Sum | Medium | Fix one, two-pointer on rest |
-| 4 | Container With Most Water | Medium | Shrink smaller side |
-| 5 | Trapping Rain Water | Hard | Max left/right arrays |
+| #   | Problem                   | Difficulty | Notes                        |
+| --- | ------------------------- | ---------- | ---------------------------- |
+| 1   | Valid Palindrome          | Easy       | Classic left/right           |
+| 2   | Two Sum II (Sorted)       | Medium     | Left/right pointing          |
+| 3   | 3Sum                      | Medium     | Fix one, two-pointer on rest |
+| 4   | Container With Most Water | Medium     | Shrink smaller side          |
+| 5   | Trapping Rain Water       | Hard       | Max left/right arrays        |
 
 ### Deep Dive: Trapping Rain Water
 
@@ -177,6 +181,7 @@ def trap(height: list[int]) -> int:
 ```
 
 **Two-pointer O(1) space version:**
+
 ```python
 def trap_optimal(height: list[int]) -> int:
     left, right = 0, len(height) - 1
@@ -205,6 +210,7 @@ def trap_optimal(height: list[int]) -> int:
 **Core idea:** Maintain a window `[left, right]` and expand/contract it. Avoids re-computing from scratch for each subarray.
 
 **Template — variable size window:**
+
 ```python
 def longest_substring_without_repeat(s: str) -> int:
     char_index = {}
@@ -221,14 +227,14 @@ def longest_substring_without_repeat(s: str) -> int:
 
 ### Key Problems
 
-| # | Problem | Difficulty | Companies |
-|---|---------|-----------|-----------|
-| 1 | Best Time to Buy/Sell Stock | Easy | Everywhere |
-| 2 | Longest Substring Without Repeating | Medium | Google, Amazon |
-| 3 | Longest Repeating Character Replacement | Medium | Google |
-| 4 | Permutation in String | Medium | Google, Facebook |
-| 5 | Minimum Window Substring | Hard | Google, Facebook |
-| 6 | Sliding Window Maximum | Hard | Google |
+| #   | Problem                                 | Difficulty | Companies        |
+| --- | --------------------------------------- | ---------- | ---------------- |
+| 1   | Best Time to Buy/Sell Stock             | Easy       | Everywhere       |
+| 2   | Longest Substring Without Repeating     | Medium     | Google, Amazon   |
+| 3   | Longest Repeating Character Replacement | Medium     | Google           |
+| 4   | Permutation in String                   | Medium     | Google, Facebook |
+| 5   | Minimum Window Substring                | Hard       | Google, Facebook |
+| 6   | Sliding Window Maximum                  | Hard       | Google           |
 
 ### Deep Dive: Minimum Window Substring
 
@@ -278,6 +284,7 @@ def min_window(s: str, t: str) -> str:
 **Core idea:** On a sorted (or monotonic) domain, binary search reduces O(n) to O(log n). The pattern extends beyond sorted arrays — any problem where you can define a predicate that is False...False...True...True can use binary search.
 
 **Generalized template:**
+
 ```python
 def binary_search_template(nums: list[int], target: int) -> int:
     left, right = 0, len(nums) - 1
@@ -294,15 +301,15 @@ def binary_search_template(nums: list[int], target: int) -> int:
 
 ### Key Problems
 
-| # | Problem | Difficulty | Notes |
-|---|---------|-----------|-------|
-| 1 | Binary Search | Easy | Template baseline |
-| 2 | Search in Rotated Sorted Array | Medium | Determine sorted half |
-| 3 | Find Minimum in Rotated Sorted Array | Medium | Classic |
-| 4 | Search a 2D Matrix | Medium | Flatten the matrix |
-| 5 | Koko Eating Bananas | Medium | Binary search on answer |
-| 6 | Minimum in Rotated Array II (with dups) | Hard | Tricky edge cases |
-| 7 | Median of Two Sorted Arrays | Hard | Google, Amazon |
+| #   | Problem                                 | Difficulty | Notes                   |
+| --- | --------------------------------------- | ---------- | ----------------------- |
+| 1   | Binary Search                           | Easy       | Template baseline       |
+| 2   | Search in Rotated Sorted Array          | Medium     | Determine sorted half   |
+| 3   | Find Minimum in Rotated Sorted Array    | Medium     | Classic                 |
+| 4   | Search a 2D Matrix                      | Medium     | Flatten the matrix      |
+| 5   | Koko Eating Bananas                     | Medium     | Binary search on answer |
+| 6   | Minimum in Rotated Array II (with dups) | Hard       | Tricky edge cases       |
+| 7   | Median of Two Sorted Arrays             | Hard       | Google, Amazon          |
 
 ### Deep Dive: Binary Search on the Answer (Koko Eating Bananas)
 
@@ -338,13 +345,13 @@ def min_eating_speed(piles: list[int], h: int) -> int:
 
 ### Key Problems
 
-| # | Problem | Difficulty | Companies |
-|---|---------|-----------|-----------|
-| 1 | Valid Parentheses | Easy | Everywhere |
-| 2 | Min Stack | Medium | Amazon |
-| 3 | Daily Temperatures | Medium | Google, Amazon |
-| 4 | Car Fleet | Medium | Google |
-| 5 | Largest Rectangle in Histogram | Hard | Google |
+| #   | Problem                        | Difficulty | Companies      |
+| --- | ------------------------------ | ---------- | -------------- |
+| 1   | Valid Parentheses              | Easy       | Everywhere     |
+| 2   | Min Stack                      | Medium     | Amazon         |
+| 3   | Daily Temperatures             | Medium     | Google, Amazon |
+| 4   | Car Fleet                      | Medium     | Google         |
+| 5   | Largest Rectangle in Histogram | Hard       | Google         |
 
 ### Deep Dive: Daily Temperatures (Monotonic Stack)
 
@@ -401,16 +408,16 @@ def largest_rectangle(heights: list[int]) -> int:
 
 ### Key Problems
 
-| # | Problem | Difficulty | Companies |
-|---|---------|-----------|-----------|
-| 1 | Reverse Linked List | Easy | Everywhere |
-| 2 | Merge Two Sorted Lists | Easy | Google, Amazon |
-| 3 | Reorder List | Medium | Facebook |
-| 4 | Remove N-th Node from End | Medium | Amazon |
-| 5 | Add Two Numbers | Medium | Facebook, Apple |
-| 6 | Copy List with Random Pointer | Medium | Google |
-| 7 | LRU Cache | Medium | Google, Amazon, Meta |
-| 8 | Merge K Sorted Lists | Hard | Google, LinkedIn |
+| #   | Problem                       | Difficulty | Companies            |
+| --- | ----------------------------- | ---------- | -------------------- |
+| 1   | Reverse Linked List           | Easy       | Everywhere           |
+| 2   | Merge Two Sorted Lists        | Easy       | Google, Amazon       |
+| 3   | Reorder List                  | Medium     | Facebook             |
+| 4   | Remove N-th Node from End     | Medium     | Amazon               |
+| 5   | Add Two Numbers               | Medium     | Facebook, Apple      |
+| 6   | Copy List with Random Pointer | Medium     | Google               |
+| 7   | LRU Cache                     | Medium     | Google, Amazon, Meta |
+| 8   | Merge K Sorted Lists          | Hard       | Google, LinkedIn     |
 
 ### Deep Dive: LRU Cache
 
@@ -443,6 +450,7 @@ class LRUCache:
 ```
 
 **From-scratch implementation (doubly linked list + hashmap):**
+
 ```python
 class Node:
     def __init__(self, key=0, val=0):
@@ -535,21 +543,21 @@ def level_order(root):
 
 ### Key Problems
 
-| # | Problem | Difficulty | Companies |
-|---|---------|-----------|-----------|
-| 1 | Invert Binary Tree | Easy | Google (famously) |
-| 2 | Maximum Depth of Binary Tree | Easy | Amazon |
-| 3 | Same Tree | Easy | Amazon |
-| 4 | Subtree of Another Tree | Easy | Amazon |
-| 5 | Lowest Common Ancestor | Medium | Google, Facebook |
-| 6 | Binary Tree Level Order Traversal | Medium | Everywhere |
-| 7 | Binary Tree Right Side View | Medium | Facebook |
-| 8 | Count Good Nodes | Medium | Google |
-| 9 | Validate BST | Medium | Amazon, Google |
-| 10 | Kth Smallest in BST | Medium | Google |
-| 11 | Construct Tree from Inorder+Preorder | Medium | Google |
-| 12 | Max Path Sum | Hard | Google, Facebook |
-| 13 | Serialize and Deserialize Binary Tree | Hard | Google |
+| #   | Problem                               | Difficulty | Companies         |
+| --- | ------------------------------------- | ---------- | ----------------- |
+| 1   | Invert Binary Tree                    | Easy       | Google (famously) |
+| 2   | Maximum Depth of Binary Tree          | Easy       | Amazon            |
+| 3   | Same Tree                             | Easy       | Amazon            |
+| 4   | Subtree of Another Tree               | Easy       | Amazon            |
+| 5   | Lowest Common Ancestor                | Medium     | Google, Facebook  |
+| 6   | Binary Tree Level Order Traversal     | Medium     | Everywhere        |
+| 7   | Binary Tree Right Side View           | Medium     | Facebook          |
+| 8   | Count Good Nodes                      | Medium     | Google            |
+| 9   | Validate BST                          | Medium     | Amazon, Google    |
+| 10  | Kth Smallest in BST                   | Medium     | Google            |
+| 11  | Construct Tree from Inorder+Preorder  | Medium     | Google            |
+| 12  | Max Path Sum                          | Hard       | Google, Facebook  |
+| 13  | Serialize and Deserialize Binary Tree | Hard       | Google            |
 
 ### Deep Dive: Maximum Path Sum
 
@@ -590,6 +598,7 @@ def max_path_sum(root: TreeNode) -> int:
 **Why this is critical for AI engineers:** Neural networks are computation graphs. GNNs operate on graphs. Knowledge graphs underpin RAG systems. Graph algorithms show up constantly.
 
 **Graph representations:**
+
 ```python
 # Adjacency list (most common)
 graph = {
@@ -611,6 +620,7 @@ def build_adj(n: int, edges: list) -> dict:
 ```
 
 **BFS template:**
+
 ```python
 from collections import deque
 
@@ -629,6 +639,7 @@ def bfs(graph: dict, start: int) -> list[int]:
 ```
 
 **DFS template:**
+
 ```python
 def dfs(graph: dict, node: int, visited: set) -> None:
     visited.add(node)
@@ -639,20 +650,20 @@ def dfs(graph: dict, node: int, visited: set) -> None:
 
 ### Key Problems
 
-| # | Problem | Difficulty | Pattern | Companies |
-|---|---------|-----------|---------|-----------|
-| 1 | Number of Islands | Medium | DFS/BFS on grid | Amazon, Google |
-| 2 | Clone Graph | Medium | BFS + HashMap | Facebook |
-| 3 | Pacific Atlantic Water Flow | Medium | Multi-source BFS | Google |
-| 4 | Course Schedule | Medium | Topo Sort/Cycle | Google, Facebook |
-| 5 | Course Schedule II | Medium | Topo Sort | Google |
-| 6 | Graph Valid Tree | Medium | Union-Find | LinkedIn |
-| 7 | Number of Connected Components | Medium | Union-Find | LinkedIn |
-| 8 | Word Ladder | Hard | BFS + word graph | Amazon, Google |
-| 9 | Alien Dictionary | Hard | Topo Sort | Airbnb, Google |
-| 10 | Network Delay Time (Dijkstra) | Medium | Weighted BFS | Google |
-| 11 | Cheapest Flights (Bellman-Ford) | Medium | k-step BFS | Google |
-| 12 | Reconstruct Itinerary | Hard | Eulerian path | Google |
+| #   | Problem                         | Difficulty | Pattern          | Companies        |
+| --- | ------------------------------- | ---------- | ---------------- | ---------------- |
+| 1   | Number of Islands               | Medium     | DFS/BFS on grid  | Amazon, Google   |
+| 2   | Clone Graph                     | Medium     | BFS + HashMap    | Facebook         |
+| 3   | Pacific Atlantic Water Flow     | Medium     | Multi-source BFS | Google           |
+| 4   | Course Schedule                 | Medium     | Topo Sort/Cycle  | Google, Facebook |
+| 5   | Course Schedule II              | Medium     | Topo Sort        | Google           |
+| 6   | Graph Valid Tree                | Medium     | Union-Find       | LinkedIn         |
+| 7   | Number of Connected Components  | Medium     | Union-Find       | LinkedIn         |
+| 8   | Word Ladder                     | Hard       | BFS + word graph | Amazon, Google   |
+| 9   | Alien Dictionary                | Hard       | Topo Sort        | Airbnb, Google   |
+| 10  | Network Delay Time (Dijkstra)   | Medium     | Weighted BFS     | Google           |
+| 11  | Cheapest Flights (Bellman-Ford) | Medium     | k-step BFS       | Google           |
+| 12  | Reconstruct Itinerary           | Hard       | Eulerian path    | Google           |
 
 ### Deep Dive: Topological Sort (Course Schedule)
 
@@ -692,6 +703,7 @@ def find_order(num_courses: int, prerequisites: list) -> list[int]:
 ```
 
 **DFS-based topo sort with cycle detection:**
+
 ```python
 def can_finish(num_courses: int, prerequisites: list) -> bool:
     adj = defaultdict(list)
@@ -780,14 +792,14 @@ def top_k_frequent(nums: list[int], k: int) -> list[int]:
 
 ### Key Problems
 
-| # | Problem | Difficulty | Companies |
-|---|---------|-----------|-----------|
-| 1 | Kth Largest Element in Array | Medium | Google, Facebook |
-| 2 | K Closest Points to Origin | Medium | Google, Amazon |
-| 3 | Task Scheduler | Medium | Facebook |
-| 4 | Design Twitter Feed | Medium | Twitter/X |
-| 5 | Find Median from Data Stream | Hard | Google |
-| 6 | Merge K Sorted Lists | Hard | Google |
+| #   | Problem                      | Difficulty | Companies        |
+| --- | ---------------------------- | ---------- | ---------------- |
+| 1   | Kth Largest Element in Array | Medium     | Google, Facebook |
+| 2   | K Closest Points to Origin   | Medium     | Google, Amazon   |
+| 3   | Task Scheduler               | Medium     | Facebook         |
+| 4   | Design Twitter Feed          | Medium     | Twitter/X        |
+| 5   | Find Median from Data Stream | Hard       | Google           |
+| 6   | Merge K Sorted Lists         | Hard       | Google           |
 
 ### Deep Dive: Find Median from Data Stream
 
@@ -829,6 +841,7 @@ class MedianFinder:
 **The most important pattern for FAANG/top-company interviews.** DP solves problems with overlapping subproblems and optimal substructure.
 
 **Decision framework:**
+
 ```
 Is this a DP problem?
   ✓ Asked for a count, maximum, minimum, or True/False
@@ -915,21 +928,21 @@ def min_distance(word1: str, word2: str) -> int:
 
 ### Key DP Problems
 
-| # | Problem | Difficulty | Pattern | Companies |
-|---|---------|-----------|---------|-----------|
-| 1 | Climbing Stairs | Easy | 1D Fibonacci | Everywhere |
-| 2 | House Robber | Medium | 1D linear | Amazon |
-| 3 | Coin Change | Medium | 1D unbounded knapsack | Google, Amazon |
-| 4 | Longest Increasing Subsequence | Medium | 1D + binary search | Google |
-| 5 | Longest Common Subsequence | Medium | 2D string DP | Google |
-| 6 | Edit Distance | Medium | 2D string DP | Google, Facebook |
-| 7 | Unique Paths | Medium | 2D grid DP | Google |
-| 8 | Maximal Square | Medium | 2D grid DP | Facebook |
-| 9 | Best Time to Buy/Sell (with cooldown) | Medium | State machine DP | Amazon |
-| 10 | Word Break | Medium | 1D + trie | Google |
-| 11 | Palindromic Substrings | Medium | 2D string DP | Facebook |
-| 12 | Burst Balloons | Hard | Interval DP | Google |
-| 13 | Regular Expression Matching | Hard | 2D DP | Google, Facebook |
+| #   | Problem                               | Difficulty | Pattern               | Companies        |
+| --- | ------------------------------------- | ---------- | --------------------- | ---------------- |
+| 1   | Climbing Stairs                       | Easy       | 1D Fibonacci          | Everywhere       |
+| 2   | House Robber                          | Medium     | 1D linear             | Amazon           |
+| 3   | Coin Change                           | Medium     | 1D unbounded knapsack | Google, Amazon   |
+| 4   | Longest Increasing Subsequence        | Medium     | 1D + binary search    | Google           |
+| 5   | Longest Common Subsequence            | Medium     | 2D string DP          | Google           |
+| 6   | Edit Distance                         | Medium     | 2D string DP          | Google, Facebook |
+| 7   | Unique Paths                          | Medium     | 2D grid DP            | Google           |
+| 8   | Maximal Square                        | Medium     | 2D grid DP            | Facebook         |
+| 9   | Best Time to Buy/Sell (with cooldown) | Medium     | State machine DP      | Amazon           |
+| 10  | Word Break                            | Medium     | 1D + trie             | Google           |
+| 11  | Palindromic Substrings                | Medium     | 2D string DP          | Facebook         |
+| 12  | Burst Balloons                        | Hard       | Interval DP           | Google           |
+| 13  | Regular Expression Matching           | Hard       | 2D DP                 | Google, Facebook |
 
 ### Deep Dive: Longest Increasing Subsequence (LIS)
 
@@ -963,9 +976,10 @@ def length_of_lis(nums: list[int]) -> int:
 
 ## 17.12 Pattern 11: Backtracking
 
-**Core idea:** Build a solution incrementally, abandon ("prune") branches that can't lead to a valid solution. 
+**Core idea:** Build a solution incrementally, abandon ("prune") branches that can't lead to a valid solution.
 
 **Template:**
+
 ```python
 def backtrack(state, choices, result):
     if is_complete(state):
@@ -980,16 +994,16 @@ def backtrack(state, choices, result):
 
 ### Key Problems
 
-| # | Problem | Difficulty | Companies |
-|---|---------|-----------|-----------|
-| 1 | Subsets | Medium | Google |
-| 2 | Permutations | Medium | Google, Facebook |
-| 3 | Combination Sum | Medium | Google |
-| 4 | Letter Combinations (Phone) | Medium | Google, Amazon |
-| 5 | Palindrome Partitioning | Medium | Facebook |
-| 6 | N-Queens | Hard | Google |
-| 7 | Sudoku Solver | Hard | Google |
-| 8 | Word Search | Medium | Microsoft, Amazon |
+| #   | Problem                     | Difficulty | Companies         |
+| --- | --------------------------- | ---------- | ----------------- |
+| 1   | Subsets                     | Medium     | Google            |
+| 2   | Permutations                | Medium     | Google, Facebook  |
+| 3   | Combination Sum             | Medium     | Google            |
+| 4   | Letter Combinations (Phone) | Medium     | Google, Amazon    |
+| 5   | Palindrome Partitioning     | Medium     | Facebook          |
+| 6   | N-Queens                    | Hard       | Google            |
+| 7   | Sudoku Solver               | Hard       | Google            |
+| 8   | Word Search                 | Medium     | Microsoft, Amazon |
 
 ### Deep Dive: Combination Sum
 
@@ -1056,12 +1070,12 @@ class Trie:
 
 ### Key Problems
 
-| # | Problem | Difficulty | Companies |
-|---|---------|-----------|-----------|
-| 1 | Implement Trie | Medium | Google |
-| 2 | Design Add and Search Words | Medium | Facebook |
-| 3 | Word Search II (find all words) | Hard | Google |
-| 4 | Auto-Complete Search System | Hard | Google |
+| #   | Problem                         | Difficulty | Companies |
+| --- | ------------------------------- | ---------- | --------- |
+| 1   | Implement Trie                  | Medium     | Google    |
+| 2   | Design Add and Search Words     | Medium     | Facebook  |
+| 3   | Word Search II (find all words) | Hard       | Google    |
+| 4   | Auto-Complete Search System     | Hard       | Google    |
 
 ---
 
@@ -1083,13 +1097,13 @@ def merge_intervals(intervals: list[list[int]]) -> list[list[int]]:
 
 ### Key Problems
 
-| # | Problem | Difficulty | Companies |
-|---|---------|-----------|-----------|
-| 1 | Merge Intervals | Medium | Google, Facebook |
-| 2 | Insert Interval | Medium | Google |
-| 3 | Non-overlapping Intervals | Medium | Amazon |
-| 4 | Meeting Rooms II (min rooms) | Medium | Facebook (premium) |
-| 5 | Minimum Interval to Include Each Query | Hard | Google |
+| #   | Problem                                | Difficulty | Companies          |
+| --- | -------------------------------------- | ---------- | ------------------ |
+| 1   | Merge Intervals                        | Medium     | Google, Facebook   |
+| 2   | Insert Interval                        | Medium     | Google             |
+| 3   | Non-overlapping Intervals              | Medium     | Amazon             |
+| 4   | Meeting Rooms II (min rooms)           | Medium     | Facebook (premium) |
+| 5   | Minimum Interval to Include Each Query | Hard       | Google             |
 
 ---
 
@@ -1328,42 +1342,49 @@ def bpe(text: str, num_merges: int) -> list:
 ## 17.17 Company-Specific Interview Patterns
 
 ### Google / Google DeepMind
+
 - **Heavy on:** Trees, graphs (especially topo sort), DP, binary search on answer
 - **Signature problems:** Word Ladder, Alien Dictionary, K Closest Points, Design Search Autocomplete
 - **ML round:** Implement training loops, describe backprop mathematically, optimize inference latency
 - **Tips:** Communicate big-O before coding. They care about clean code structure.
 
 ### Meta (Facebook) AI Research
+
 - **Heavy on:** Arrays, graphs, trees (especially serialization/reconstruction)
 - **Signature problems:** Serialize/Deserialize Binary Tree, LRU Cache, Regular Expression Matching
 - **ML round:** Recommender systems, feed ranking, real-time feature computation
 - **Tips:** Speed matters. Optimize for fewer lines of code. Know FB-specific ML scale.
 
 ### Apple ML
+
 - **Heavy on:** Matrices, string processing, design problems
 - **Signature problems:** Matrix-related (rotate, search), on-device ML constraints
 - **ML round:** Privacy-preserving ML, on-device inference, Core ML integration
 - **Tips:** Privacy and efficiency win points. Mention power consumption for ML inference.
 
 ### Amazon / AWS AI
+
 - **Heavy on:** OOP design, linked lists, trees, DP
 - **Signature problems:** LRU Cache, Design Twitter, Merge K Sorted Lists
 - **ML round:** SageMaker pipeline design, distributed training, model endpoint latency
 - **Tips:** Always connect to Leadership Principles. STAR format for behavioral.
 
 ### OpenAI / Anthropic
+
 - **Heavy on:** ML fundamentals (implement from scratch), Python performance, system design
 - **Signature problems:** Implement attention, write a tokenizer, implement autoregressive generation
 - **ML round:** Deep dives on training dynamics, RLHF, safety considerations
 - **Tips:** Expect to implement things at the numpy level. Read their papers before the interview.
 
 ### NVIDIA
+
 - **Heavy on:** Parallel algorithms, GPU memory management, matrix operations
 - **Signature problems:** Matrix multiplication variants, prefix scan, tiling
 - **ML round:** CUDA optimization, memory bandwidth calculations, quantization
 - **Tips:** Know FLOP/s vs bandwidth bottlenecks for ops. Know tensor cores.
 
 ### Databricks / Hugging Face / Scale AI
+
 - **Heavy on:** Data processing, distributed systems, model evaluation
 - **Signature problems:** Top-K, merge sorted, distributed word count
 - **ML round:** Pipeline design, model serving, evaluation harnesses
@@ -1444,6 +1465,7 @@ Week 8: ML-Specific + Company Mock Interviews
 ## 17.19 Python Patterns Every AI Engineer Must Know
 
 ### Comprehensions & Generator Tricks
+
 ```python
 # List comprehension with condition
 squares_of_evens = [x**2 for x in range(20) if x % 2 == 0]
@@ -1462,6 +1484,7 @@ pairs = sorted(zip(scores, words), key=lambda x: -x[0])  # sort by score desc
 ```
 
 ### Collections Module (Know Cold)
+
 ```python
 from collections import Counter, defaultdict, deque, OrderedDict
 
@@ -1480,6 +1503,7 @@ d.popleft()        # O(1)
 ```
 
 ### heapq Module
+
 ```python
 import heapq
 
@@ -1496,6 +1520,7 @@ heapq.heapify(nums)
 ```
 
 ### Bisect Module (Binary Search in Python)
+
 ```python
 import bisect
 
@@ -1506,6 +1531,7 @@ bisect.insort(nums, 5)        # insert maintaining sorted order
 ```
 
 ### String Operations
+
 ```python
 s = "Hello World"
 s.split()          # ['Hello', 'World']
@@ -1521,54 +1547,52 @@ chr(97)            # 'a' — ASCII to char
 
 ## 17.20 Time & Space Complexity Cheat Sheet
 
-```
-Data Structure Operations:
-┌─────────────────────┬────────────┬────────┬────────┬────────┐
-│ Structure           │ Access     │ Search │ Insert │ Delete │
-├─────────────────────┼────────────┼────────┼────────┼────────┤
-│ Array / List        │ O(1)       │ O(n)   │ O(n)   │ O(n)   │
-│ HashMap/Set         │ O(1) avg   │ O(1)   │ O(1)   │ O(1)   │
-│ BST (balanced)      │ O(log n)   │ O(log n)│O(log n)│O(log n)│
-│ Min/Max Heap        │ O(1) top   │ O(n)   │ O(log n)│O(log n)│
-│ Trie                │ O(m)       │ O(m)   │ O(m)   │ O(m)   │
-│ Graph (adj list)    │ O(V+E)     │ O(V+E) │ O(1)   │ O(E)   │
-└─────────────────────┴────────────┴────────┴────────┴────────┘
+**Data Structure Operations**
 
-Algorithm Complexities:
-┌──────────────────────────────┬────────────┬────────────┐
-│ Algorithm                    │ Time       │ Space      │
-├──────────────────────────────┼────────────┼────────────┤
-│ Binary Search                │ O(log n)   │ O(1)       │
-│ BFS / DFS                    │ O(V + E)   │ O(V)       │
-│ Dijkstra (heap)              │ O(E log V) │ O(V)       │
-│ Topological Sort             │ O(V + E)   │ O(V)       │
-│ Merge Sort                   │ O(n log n) │ O(n)       │
-│ Quick Sort (avg)             │ O(n log n) │ O(log n)   │
-│ Heap Sort                    │ O(n log n) │ O(1)       │
-│ Counting Sort                │ O(n + k)   │ O(k)       │
-│ 2D DP (LCS, Edit Distance)   │ O(m × n)   │ O(m × n)   │
-│ Backtracking (subsets)       │ O(2ⁿ)      │ O(n)       │
-│ Backtracking (permutations)  │ O(n!)      │ O(n)       │
-└──────────────────────────────┴────────────┴────────────┘
-```
+| Structure | Access | Search | Insert | Delete |
+|-----------|--------|--------|--------|--------|
+| Array / List | O(1) | O(n) | O(n) | O(n) |
+| HashMap / Set | O(1) avg | O(1) | O(1) | O(1) |
+| BST (balanced) | O(log n) | O(log n) | O(log n) | O(log n) |
+| Min/Max Heap | O(1) top | O(n) | O(log n) | O(log n) |
+| Trie | O(m) | O(m) | O(m) | O(m) |
+| Graph (adj list) | O(V+E) | O(V+E) | O(1) | O(E) |
+
+**Algorithm Complexities**
+
+| Algorithm | Time | Space |
+|-----------|------|-------|
+| Binary Search | O(log n) | O(1) |
+| BFS / DFS | O(V + E) | O(V) |
+| Dijkstra (heap) | O(E log V) | O(V) |
+| Topological Sort | O(V + E) | O(V) |
+| Merge Sort | O(n log n) | O(n) |
+| Quick Sort (avg) | O(n log n) | O(log n) |
+| Heap Sort | O(n log n) | O(1) |
+| Counting Sort | O(n + k) | O(k) |
+| 2D DP (LCS, Edit Distance) | O(m × n) | O(m × n) |
+| Backtracking (subsets) | O(2ⁿ) | O(n) |
+| Backtracking (permutations) | O(n!) | O(n) |
 
 ---
 
 ## 17.21 Interview Communication Framework
 
-The #1 reason candidates fail is not knowing the answer — it's *not communicating their thought process*.
+The #1 reason candidates fail is not knowing the answer — it's _not communicating their thought process_.
 
-```
-The UMPIRE Method:
-  U — Understand the problem (restate it, identify input/output)
-  M — Match to a pattern ("this looks like a graph BFS problem")
-  P — Plan your approach (pseudocode before coding)
-  I — Implement
-  R — Review (trace through an example)
-  E — Evaluate complexity (time and space)
+```mermaid
+flowchart LR
+    U["U — Understand\nrestate · clarify constraints"]
+    M["M — Match\nidentify the pattern"]
+    P["P — Plan\npseudocode first"]
+    I_["I — Implement\ncode the solution"]
+    R["R — Review\ntrace an example"]
+    E["E — Evaluate\ntime & space complexity"]
+    U --> M --> P --> I_ --> R --> E
 ```
 
 **What to say at each stage:**
+
 ```
 After reading the problem:
   "Let me make sure I understand. Given X, I need to return Y.
@@ -1598,73 +1622,73 @@ After coding:
 
 ### Tier 1 — Must Know Cold (Appears Everywhere)
 
-| # | Problem | Pattern | Why It Matters |
-|---|---------|---------|---------------|
-| 1 | Two Sum | HashMap | Foundational pattern |
-| 2 | Valid Parentheses | Stack | Foundational |
-| 3 | Merge Two Sorted Lists | Linked List | Sorting building block |
-| 4 | Best Time to Buy & Sell Stock | Sliding Window / DP | Classic optimization |
-| 5 | Invert Binary Tree | Tree DFS | Google's famous problem |
-| 6 | Climbing Stairs | DP | Fibonacci / DP intro |
-| 7 | Binary Search | Binary Search | Template baseline |
-| 8 | Longest Substring Without Repeating | Sliding Window | Sliding window template |
-| 9 | Reverse Linked List | Linked List | Core pointer manip |
-| 10 | Number of Islands | Graph DFS/BFS | Graph traversal template |
+| #   | Problem                             | Pattern             | Why It Matters           |
+| --- | ----------------------------------- | ------------------- | ------------------------ |
+| 1   | Two Sum                             | HashMap             | Foundational pattern     |
+| 2   | Valid Parentheses                   | Stack               | Foundational             |
+| 3   | Merge Two Sorted Lists              | Linked List         | Sorting building block   |
+| 4   | Best Time to Buy & Sell Stock       | Sliding Window / DP | Classic optimization     |
+| 5   | Invert Binary Tree                  | Tree DFS            | Google's famous problem  |
+| 6   | Climbing Stairs                     | DP                  | Fibonacci / DP intro     |
+| 7   | Binary Search                       | Binary Search       | Template baseline        |
+| 8   | Longest Substring Without Repeating | Sliding Window      | Sliding window template  |
+| 9   | Reverse Linked List                 | Linked List         | Core pointer manip       |
+| 10  | Number of Islands                   | Graph DFS/BFS       | Graph traversal template |
 
 ### Tier 2 — High Frequency (Appear at FAANG)
 
-| # | Problem | Pattern |
-|---|---------|---------|
-| 11 | 3Sum | Two Pointers |
-| 12 | LRU Cache | LinkedList + HashMap |
-| 13 | House Robber | 1D DP |
-| 14 | Course Schedule | Topo Sort |
-| 15 | Product of Array Except Self | Prefix/Suffix |
-| 16 | Maximum Subarray (Kadane's) | 1D DP / Greedy |
-| 17 | Coin Change | 1D DP |
-| 18 | Container With Most Water | Two Pointers |
-| 19 | Validate BST | Tree DFS |
-| 20 | Word Break | DP + Trie |
-| 21 | Lowest Common Ancestor | Tree DFS |
-| 22 | Merge Intervals | Intervals |
-| 23 | Top K Frequent Elements | Heap + HashMap |
-| 24 | Pacific Atlantic Water Flow | Multi-source BFS |
-| 25 | Implement Trie | Trie |
-| 26 | Serialize/Deserialize Tree | Tree BFS |
-| 27 | Alien Dictionary | Topo Sort |
-| 28 | Trapping Rain Water | Two Pointers |
-| 29 | Merge K Sorted Lists | Heap |
-| 30 | Longest Common Subsequence | 2D DP |
+| #   | Problem                      | Pattern              |
+| --- | ---------------------------- | -------------------- |
+| 11  | 3Sum                         | Two Pointers         |
+| 12  | LRU Cache                    | LinkedList + HashMap |
+| 13  | House Robber                 | 1D DP                |
+| 14  | Course Schedule              | Topo Sort            |
+| 15  | Product of Array Except Self | Prefix/Suffix        |
+| 16  | Maximum Subarray (Kadane's)  | 1D DP / Greedy       |
+| 17  | Coin Change                  | 1D DP                |
+| 18  | Container With Most Water    | Two Pointers         |
+| 19  | Validate BST                 | Tree DFS             |
+| 20  | Word Break                   | DP + Trie            |
+| 21  | Lowest Common Ancestor       | Tree DFS             |
+| 22  | Merge Intervals              | Intervals            |
+| 23  | Top K Frequent Elements      | Heap + HashMap       |
+| 24  | Pacific Atlantic Water Flow  | Multi-source BFS     |
+| 25  | Implement Trie               | Trie                 |
+| 26  | Serialize/Deserialize Tree   | Tree BFS             |
+| 27  | Alien Dictionary             | Topo Sort            |
+| 28  | Trapping Rain Water          | Two Pointers         |
+| 29  | Merge K Sorted Lists         | Heap                 |
+| 30  | Longest Common Subsequence   | 2D DP                |
 
 ### Tier 3 — Differentiators (Separate Good from Great)
 
-| # | Problem | Pattern |
-|---|---------|---------|
-| 31 | Regular Expression Matching | 2D DP |
-| 32 | Word Search II | Backtracking + Trie |
-| 33 | Find Median from Data Stream | Two Heaps |
-| 34 | Sliding Window Maximum | Monotonic Deque |
-| 35 | Edit Distance | 2D DP |
-| 36 | N-Queens | Backtracking |
-| 37 | Largest Rectangle in Histogram | Monotonic Stack |
-| 38 | Burst Balloons | Interval DP |
-| 39 | Reverse Nodes in k-Group | Linked List |
-| 40 | K-th Largest in Stream | Heap |
+| #   | Problem                        | Pattern             |
+| --- | ------------------------------ | ------------------- |
+| 31  | Regular Expression Matching    | 2D DP               |
+| 32  | Word Search II                 | Backtracking + Trie |
+| 33  | Find Median from Data Stream   | Two Heaps           |
+| 34  | Sliding Window Maximum         | Monotonic Deque     |
+| 35  | Edit Distance                  | 2D DP               |
+| 36  | N-Queens                       | Backtracking        |
+| 37  | Largest Rectangle in Histogram | Monotonic Stack     |
+| 38  | Burst Balloons                 | Interval DP         |
+| 39  | Reverse Nodes in k-Group       | Linked List         |
+| 40  | K-th Largest in Stream         | Heap                |
 
 ### ML-Specific (For AI Engineer Rounds)
 
-| # | Problem | Skills Tested |
-|---|---------|--------------|
-| 41 | Implement softmax with numerical stability | NumPy + numerical methods |
-| 42 | Implement attention mechanism | Matrix ops understanding |
-| 43 | Top-K sampling from logits | Probability + heap |
-| 44 | Implement K-Means clustering | Array manipulation |
-| 45 | Implement SGD optimizer step | Gradient + numerical |
-| 46 | Sparse vector dot product | HashMap efficiency |
-| 47 | Matrix multiplication variants | NumPy, O(n³) awareness |
-| 48 | Implement BPE merge step | String processing |
-| 49 | Cosine similarity search | Linear algebra |
-| 50 | Implement early stopping logic | State machine / DP |
+| #   | Problem                                    | Skills Tested             |
+| --- | ------------------------------------------ | ------------------------- |
+| 41  | Implement softmax with numerical stability | NumPy + numerical methods |
+| 42  | Implement attention mechanism              | Matrix ops understanding  |
+| 43  | Top-K sampling from logits                 | Probability + heap        |
+| 44  | Implement K-Means clustering               | Array manipulation        |
+| 45  | Implement SGD optimizer step               | Gradient + numerical      |
+| 46  | Sparse vector dot product                  | HashMap efficiency        |
+| 47  | Matrix multiplication variants             | NumPy, O(n³) awareness    |
+| 48  | Implement BPE merge step                   | String processing         |
+| 49  | Cosine similarity search                   | Linear algebra            |
+| 50  | Implement early stopping logic             | State machine / DP        |
 
 ---
 
@@ -1683,7 +1707,7 @@ After coding:
 ❌ Not connecting your solution to the interviewer's follow-up hints
 
 ✓ Always restate the problem before diving in
-✓ Write comments as you code  
+✓ Write comments as you code
 ✓ Use meaningful variable names (not just 'i', 'j')
 ✓ Volunteer complexity analysis before being asked
 ✓ After solving, proactively suggest optimizations
@@ -1696,7 +1720,7 @@ After coding:
 
 - **LeetCode Patterns:** [Sean Prashad's List](https://seanprashad.com/leetcode-patterns/) — organized by pattern
 - **NeetCode 150:** neetcode.io — curated 150 with video explanations
-- **Grokking Algorithms** (book) — visual explanations for non-Googlers  
+- **Grokking Algorithms** (book) — visual explanations for non-Googlers
 - **Cracking the Coding Interview** (book) — behavioral + technical combined
 - **Elements of Programming Interviews in Python** — hardest problems with Python
 - **Blind 75:** The original curated list — still relevant
